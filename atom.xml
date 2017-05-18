@@ -1,0 +1,932 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>hotbaby</title>
+  <subtitle>hotbaby&#39;s blog</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://blog.hotbaby.org/"/>
+  <updated>2017-05-17T12:20:29.000Z</updated>
+  <id>http://blog.hotbaby.org/</id>
+  
+  <author>
+    <name>hotbaby</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Django database router</title>
+    <link href="http://blog.hotbaby.org/2017/05/17/django-db-router/"/>
+    <id>http://blog.hotbaby.org/2017/05/17/django-db-router/</id>
+    <published>2017-05-17T11:56:00.000Z</published>
+    <updated>2017-05-17T12:20:29.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>django ORM数据模型配置数据库．</p>
+<p>django支持多个数据库，通过django ORM定义数据模型，比如<code>class User(Model)</code>，无法通过<code>class Meta</code>配置管理该数据模型对应的数据库，只能使用默认数据库<code>default</code>．</p>
+<p>django <code>ConnectionRouter</code>解决数据模型与数据库映射．</p>
+<p><strong>实现DB router</strong></p>
+<p><code>db_router.py</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> logging</div><div class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</div><div class="line"></div><div class="line">_logger = logging.getLogger(<span class="string">'django'</span>)</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">DatabaseRouter</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Database router to control the  models for differrent db.</div><div class="line">    """</div><div class="line"></div><div class="line">    DEFAULT_DB = <span class="string">'default'</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_db</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        db = getattr(model, <span class="string">'_database'</span>, <span class="keyword">None</span>)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> db:</div><div class="line">            <span class="keyword">return</span> self.DEFAULT_DB</div><div class="line"></div><div class="line">        <span class="keyword">if</span> db <span class="keyword">in</span> settings.DATABASES.keys():</div><div class="line">            <span class="keyword">return</span> db</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _logger.warn(<span class="string">'%s not exist'</span> % db)</div><div class="line">            <span class="keyword">return</span> self.DEFAULT_DB</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_read</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._db(model, **hints)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_write</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._db(model, **hints)</div></pre></td></tr></table></figure>
+<p><strong>配置DB routers</strong></p>
+<p><code>DATABASE_ROUTERS = [&#39;db_router.DatabaseRouter&#39;]</code></p>
+<p><strong>为Model制定数据库</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class User(Model)</div><div class="line">	_database = 'user_db'</div><div class="line">    class  Meta:</div><div class="line">    	db_table = 'user'</div><div class="line">    ...</div></pre></td></tr></table></figure>
+<p><strong>实现原理</strong></p>
+<p>django通过<code>ConnectionRouter</code>管理数据库路由</p>
+<p><code>django/db/utils.py</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConnectionRouter</span><span class="params">(object)</span>:</span></div><div class="line"></div><div class="line"><span class="meta">    @cached_property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">routers</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._routers <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            self._routers = settings.DATABASE_ROUTERS</div><div class="line">        routers = []</div><div class="line">        <span class="keyword">for</span> r <span class="keyword">in</span> self._routers:</div><div class="line">            <span class="keyword">if</span> isinstance(r, six.string_types):</div><div class="line">                router = import_string(r)()</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                router = r</div><div class="line">            routers.append(router)</div><div class="line">        <span class="keyword">return</span> routers</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_router_func</span><span class="params">(action)</span>:</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_route_db</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">            chosen_db = <span class="keyword">None</span></div><div class="line">            <span class="keyword">for</span> router <span class="keyword">in</span> self.routers:</div><div class="line">                <span class="keyword">try</span>:</div><div class="line">                    method = getattr(router, action)</div><div class="line">                <span class="keyword">except</span> AttributeError:</div><div class="line">                    <span class="comment"># If the router doesn't have a method, skip to the next one.</span></div><div class="line">                    <span class="keyword">pass</span></div><div class="line">                <span class="keyword">else</span>:</div><div class="line">                    chosen_db = method(model, **hints)</div><div class="line">                    <span class="keyword">if</span> chosen_db:</div><div class="line">                        <span class="keyword">return</span> chosen_db</div><div class="line">            instance = hints.get(<span class="string">'instance'</span>)</div><div class="line">            <span class="keyword">if</span> instance <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> instance._state.db:</div><div class="line">                <span class="keyword">return</span> instance._state.db</div><div class="line">            <span class="keyword">return</span> DEFAULT_DB_ALIAS</div><div class="line">        <span class="keyword">return</span> _route_db</div><div class="line"></div><div class="line">    db_for_read = _router_func(<span class="string">'db_for_read'</span>)</div><div class="line">    db_for_write = _router_func(<span class="string">'db_for_write'</span>)</div></pre></td></tr></table></figure>
+<p>router初始化</p>
+<p><code>router = ConnectionRouter()</code></p>
+<p>router引用</p>
+<p><code>django/db/models/query.py</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuerySet</span><span class="params">(object)</span>:</span></div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="string">"Return the database that will be used if this query is executed now"</span></div><div class="line">        <span class="keyword">if</span> self._for_write:</div><div class="line">            <span class="keyword">return</span> self._db <span class="keyword">or</span> router.db_for_write(self.model, **self._hints)</div><div class="line">        <span class="keyword">return</span> self._db <span class="keyword">or</span> router.db_for_read(self.model, **self._hints)</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;django ORM数据模型配置数据库．&lt;/p&gt;
+&lt;p&gt;django支持多个数据库，通过django ORM定义数据模型，比如&lt;code&gt;class User(Model)&lt;/code&gt;，无法通过&lt;code&gt;class Meta&lt;/code&gt;配置管理该数据模型对应的数据库，
+    
+    </summary>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTTP Cache</title>
+    <link href="http://blog.hotbaby.org/2017/05/17/http-cache/"/>
+    <id>http://blog.hotbaby.org/2017/05/17/http-cache/</id>
+    <published>2017-05-17T03:00:36.000Z</published>
+    <updated>2017-05-17T03:24:50.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>缓存是一种用来存储资源副本的技术．</p>
+<h1 id="HTTP-缓存"><a href="#HTTP-缓存" class="headerlink" title="HTTP 缓存"></a>HTTP 缓存</h1><h2 id="不同类型的缓存"><a href="#不同类型的缓存" class="headerlink" title="不同类型的缓存"></a>不同类型的缓存</h2><p>缓存的目标：</p>
+<ul>
+<li>减小服务器的负载，服务器不需要负责服务所有的客户端请求</li>
+<li>需要更少的时间回传资源</li>
+<li>…</li>
+</ul>
+<p>不同类型的缓存</p>
+<ul>
+<li>共享缓存 -　存储响应被很多用户复用</li>
+<li>私有缓存 - 服务于单个用户</li>
+</ul>
+<p>其他缓存，gateway cache, CDN, reverse proxy cache 和　部署在服务器上的负载均衡器，以获得更好的可靠性，性能．</p>
+<p><img src="https://mdn.mozillademos.org/files/13777/HTTPCachtType.png" alt=""></p>
+<h3 id="私有浏览器缓存-Private-browser-cache"><a href="#私有浏览器缓存-Private-browser-cache" class="headerlink" title="私有浏览器缓存(Private browser cache)"></a>私有浏览器缓存(Private browser cache)</h3><p>私有缓存服务于单个用户．</p>
+<h3 id="共享代理缓存-Shared-proxy-caches"><a href="#共享代理缓存-Shared-proxy-caches" class="headerlink" title="共享代理缓存(Shared proxy caches)"></a>共享代理缓存(Shared proxy caches)</h3><p>共享缓存服务于多个用户．比如ISP或者企业可以配置一个web代理，作为本地网络基础架构，服务于多个用户．热点资源可以被多个用户复用，减少网络流量和延迟．　</p>
+<h2 id="缓存操作的目标"><a href="#缓存操作的目标" class="headerlink" title="缓存操作的目标"></a>缓存操作的目标</h2><p>HTTP缓存是可选的，有的时候并不希望复用缓存资源。</p>
+<p>常用的缓存条目的形式：</p>
+<ul>
+<li>成功的检索请求结果 - 200 OK响应，比如HTML 文档，图片或者文件</li>
+<li>永久重定向 - 301(Moved Permanently)响应</li>
+<li>错误响应 - 404(Not Found)结果页</li>
+<li>未完成的结果 - 206(Partial Content)响应</li>
+<li>不仅仅是GET请求的响应 - 定义一个合适的cache key</li>
+</ul>
+<h2 id="缓存控制-Controlling-caching"><a href="#缓存控制-Controlling-caching" class="headerlink" title="缓存控制(Controlling caching)"></a>缓存控制(Controlling caching)</h2><h3 id="缓存控制头部-The-Cache-control-header"><a href="#缓存控制头部-The-Cache-control-header" class="headerlink" title="缓存控制头部(The Cache-control header)"></a>缓存控制头部(The Cache-control header)</h3><h3 id="Pragma头-The-Pragma-header"><a href="#Pragma头-The-Pragma-header" class="headerlink" title="Pragma头(The Pragma header)"></a>Pragma头(The Pragma header)</h3><h2 id="新鲜度-Freshness"><a href="#新鲜度-Freshness" class="headerlink" title="新鲜度(Freshness)"></a>新鲜度(Freshness)</h2><h3 id="Revved-资源"><a href="#Revved-资源" class="headerlink" title="Revved 资源"></a>Revved 资源</h3><h2 id="缓存验证-Cache-validation"><a href="#缓存验证-Cache-validation" class="headerlink" title="缓存验证(Cache validation)"></a>缓存验证(Cache validation)</h2><h3 id="ETags"><a href="#ETags" class="headerlink" title="ETags"></a>ETags</h3><h2 id="Varying-responses"><a href="#Varying-responses" class="headerlink" title="Varying responses"></a>Varying responses</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="external">rfc7234  Hypertext Transfer Protocol (HTTP/1.1): Caching</a></li>
+<li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;缓存是一种用来存储资源副本的技术．&lt;/p&gt;
+&lt;h1 id=&quot;HTTP-缓存&quot;&gt;&lt;a href=&quot;#HTTP-缓存&quot; class=&quot;headerlink&quot; title=&quot;HTTP 缓存&quot;&gt;&lt;/a&gt;HTTP 缓存&lt;/h1&gt;&lt;h2 id=&quot;不同类型的缓存&quot;&gt;&lt;a href=&quot;#不
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>WSGI</title>
+    <link href="http://blog.hotbaby.org/2017/05/17/WSGI/"/>
+    <id>http://blog.hotbaby.org/2017/05/17/WSGI/</id>
+    <published>2017-05-17T02:56:44.000Z</published>
+    <updated>2017-05-17T02:58:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>WSGI(Web Server Gateway Interface) Web服务网关接口。</p>
+<p>WSGI的目的替代CGI。CGI进程（类似Python解释器）针对每个请求进行创建，完成请求后退出。如果应程序接收树钱个请求，创建大量的语言解释器进程就会很快导致服务器宕机。</p>
+<p><strong>其目标在Web服务器与Web框架层之间提供一个通用的API标准，减少之间互操作性，并形成统一的调用方式。</strong></p>
+<h2 id="WSGI-应用"><a href="#WSGI-应用" class="headerlink" title="WSGI 应用"></a>WSGI 应用</h2><p>根据WSGI的定义，其应用是可调用的对象，其参数固定为两个：</p>
+<ul>
+<li>含有服务器环境变量的字典</li>
+<li>可调用的对象， 该对象使用HTTP状态码和会返回客户端的HTTP头来初始化响应</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">simple_wsgi_app</span><span class="params">(environment, start_response)</span>:</span></div><div class="line">    status = <span class="string">'200 OK'</span></div><div class="line">    headers = [<span class="string">'Content-Type'</span>: <span class="string">'text/plain'</span>]</div><div class="line">    start_response(status, headers)</div><div class="line">    <span class="keyword">return</span> [<span class="string">'Hello world!'</span>]</div></pre></td></tr></table></figure>
+<p><strong>environment</strong> 包含一些环境变量，如HTTP_HOST, HTTP_USER, HTTP_AGENT, SERVER_PROTOCOL等。‘</p>
+<p><strong>start_response()</strong>是一个可调用的对象，必须在应用执行，生成最终发送回客户端的响应</p>
+<p>werkzeug中start_response定义：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, response_headers, exc_info=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> exc_info:</div><div class="line">        <span class="keyword">try</span>:</div><div class="line">            <span class="keyword">if</span> headers_sent:</div><div class="line">                reraise(*exc_info)</div><div class="line">        <span class="keyword">finally</span>:</div><div class="line">            exc_info = <span class="keyword">None</span></div><div class="line">    <span class="keyword">elif</span> headers_set:</div><div class="line">        <span class="keyword">raise</span> AssertionError(<span class="string">'Headers already set'</span>)</div><div class="line">    headers_set[:] = [status, response_headers]</div><div class="line">    <span class="keyword">return</span> write</div></pre></td></tr></table></figure>
+<h2 id="WSGI服务器"><a href="#WSGI服务器" class="headerlink" title="WSGI服务器"></a>WSGI服务器</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> StringIO</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_wsgi_app</span><span class="params">(app, environment)</span>:</span></div><div class="line">    body = StringIO.StringIO()</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, headers)</span>:</span></div><div class="line">        body.write(<span class="string">'Status: %s\r\n'</span> % status)</div><div class="line">        <span class="keyword">for</span> header <span class="keyword">in</span> headers:</div><div class="line">            body.write(<span class="string">'%s: %s\r\n'</span> % header)</div><div class="line">        <span class="keyword">return</span> body.write</div><div class="line"></div><div class="line">    iterable = app(environment, start_response)</div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        body.write(<span class="string">'\r\n%s\r\n'</span> % <span class="string">'\r\n'</span>.join(line <span class="keyword">for</span> line <span class="keyword">in</span> iterable))</div><div class="line">    <span class="keyword">finally</span>:</div><div class="line">        <span class="keyword">if</span> hasattr(iterable, <span class="string">'close'</span>) <span class="keyword">and</span> callable(iterable.close):</div><div class="line">            iterable.close()</div></pre></td></tr></table></figure>
+<h2 id="Flask-WSGI-应用和服务实现"><a href="#Flask-WSGI-应用和服务实现" class="headerlink" title="Flask WSGI 应用和服务实现"></a>Flask WSGI 应用和服务实现</h2><p><strong>flask WSGI app</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment"># Flask:wsgi_app</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">wsgi_app</span><span class="params">(self, environ, start_response)</span>:</span></div><div class="line">    <span class="string">"""The actual WSGI application.  This is not implemented in</span></div><div class="line">    `__call__` so that middlewares can be applied without losing a</div><div class="line">    reference to the class.  So instead of doing this::</div><div class="line"></div><div class="line">        app = MyMiddleware(app)</div><div class="line"></div><div class="line">    It's a better idea to do this instead::</div><div class="line"></div><div class="line">        app.wsgi_app = MyMiddleware(app.wsgi_app)</div><div class="line"></div><div class="line">    Then you still have the original application object around and</div><div class="line">    can continue to call methods on it.</div><div class="line"></div><div class="line">    .. versionchanged:: 0.7</div><div class="line">       The behavior of the before and after request callbacks was changed</div><div class="line">       under error conditions and a new callback was added that will</div><div class="line">       always execute at the end of the request, independent on if an</div><div class="line">       error occurred or not.  See :ref:`callbacks-and-errors`.</div><div class="line"></div><div class="line">    :param environ: a WSGI environment</div><div class="line">    :param start_response: a callable accepting a status code,</div><div class="line">                           a list of headers and an optional</div><div class="line">                           exception context to start the response</div><div class="line">    """</div><div class="line">    ctx = self.request_context(environ)</div><div class="line">    ctx.push()</div><div class="line">    error = <span class="keyword">None</span></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        <span class="keyword">try</span>:</div><div class="line">            response = self.full_dispatch_request()</div><div class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</div><div class="line">            error = e</div><div class="line">            response = self.handle_exception(e)</div><div class="line">        <span class="keyword">return</span> response(environ, start_response)</div><div class="line">    <span class="keyword">finally</span>:</div><div class="line">        <span class="keyword">if</span> self.should_ignore_error(error):</div><div class="line">            error = <span class="keyword">None</span></div><div class="line">        ctx.auto_pop(error)</div><div class="line"></div><div class="line"><span class="comment"># Flask:__call__</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></div><div class="line">    <span class="string">"""Shortcut for :attr:`wsgi_app`."""</span></div><div class="line">    <span class="keyword">return</span> self.wsgi_app(environ, start_response)</div><div class="line"></div><div class="line"><span class="comment"># BaseResponse:__call__</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></div><div class="line">    <span class="string">"""Process this response as WSGI application.</span></div><div class="line"></div><div class="line">    :param environ: the WSGI environment.</div><div class="line">    :param start_response: the response callable provided by the WSGI</div><div class="line">                           server.</div><div class="line">    :return: an application iterator</div><div class="line">    """</div><div class="line">    app_iter, status, headers = self.get_wsgi_response(environ)</div><div class="line">    start_response(status, headers)</div><div class="line">    <span class="keyword">return</span> app_iter</div></pre></td></tr></table></figure>
+<p><strong>flask WSGI Server</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_wsgi</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="keyword">if</span> self.headers.get(<span class="string">'Expect'</span>, <span class="string">''</span>).lower().strip() == <span class="string">'100-continue'</span>:</div><div class="line">        self.wfile.write(<span class="string">b'HTTP/1.1 100 Continue\r\n\r\n'</span>)</div><div class="line"></div><div class="line">    self.environ = environ = self.make_environ()</div><div class="line">    headers_set = []</div><div class="line">    headers_sent = []</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">write</span><span class="params">(data)</span>:</span></div><div class="line">        <span class="keyword">assert</span> headers_set, <span class="string">'write() before start_response'</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> headers_sent:</div><div class="line">            status, response_headers = headers_sent[:] = headers_set</div><div class="line">            <span class="keyword">try</span>:</div><div class="line">                code, msg = status.split(<span class="keyword">None</span>, <span class="number">1</span>)</div><div class="line">            <span class="keyword">except</span> ValueError:</div><div class="line">                code, msg = status, <span class="string">""</span></div><div class="line">            self.send_response(int(code), msg)</div><div class="line">            header_keys = set()</div><div class="line">            <span class="keyword">for</span> key, value <span class="keyword">in</span> response_headers:</div><div class="line">                self.send_header(key, value)</div><div class="line">                key = key.lower()</div><div class="line">                header_keys.add(key)</div><div class="line">            <span class="keyword">if</span> <span class="string">'content-length'</span> <span class="keyword">not</span> <span class="keyword">in</span> header_keys:</div><div class="line">                self.close_connection = <span class="keyword">True</span></div><div class="line">                self.send_header(<span class="string">'Connection'</span>, <span class="string">'close'</span>)</div><div class="line">            <span class="keyword">if</span> <span class="string">'server'</span> <span class="keyword">not</span> <span class="keyword">in</span> header_keys:</div><div class="line">                self.send_header(<span class="string">'Server'</span>, self.version_string())</div><div class="line">            <span class="keyword">if</span> <span class="string">'date'</span> <span class="keyword">not</span> <span class="keyword">in</span> header_keys:</div><div class="line">                self.send_header(<span class="string">'Date'</span>, self.date_time_string())</div><div class="line">            self.end_headers()</div><div class="line"></div><div class="line">        <span class="keyword">assert</span> isinstance(data, bytes), <span class="string">'applications must write bytes'</span></div><div class="line">        self.wfile.write(data)</div><div class="line">        self.wfile.flush()</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, response_headers, exc_info=None)</span>:</span></div><div class="line">        <span class="keyword">if</span> exc_info:</div><div class="line">            <span class="keyword">try</span>:</div><div class="line">                <span class="keyword">if</span> headers_sent:</div><div class="line">                    reraise(*exc_info)</div><div class="line">            <span class="keyword">finally</span>:</div><div class="line">                exc_info = <span class="keyword">None</span></div><div class="line">        <span class="keyword">elif</span> headers_set:</div><div class="line">            <span class="keyword">raise</span> AssertionError(<span class="string">'Headers already set'</span>)</div><div class="line">        headers_set[:] = [status, response_headers]</div><div class="line">        <span class="keyword">return</span> write</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">execute</span><span class="params">(app)</span>:</span></div><div class="line">        application_iter = app(environ, start_response)</div><div class="line">        <span class="keyword">try</span>:</div><div class="line">            <span class="keyword">for</span> data <span class="keyword">in</span> application_iter:</div><div class="line">                write(data)</div><div class="line">            <span class="keyword">if</span> <span class="keyword">not</span> headers_sent:</div><div class="line">                write(<span class="string">b''</span>)</div><div class="line">        <span class="keyword">finally</span>:</div><div class="line">            <span class="keyword">if</span> hasattr(application_iter, <span class="string">'close'</span>):</div><div class="line">                application_iter.close()</div><div class="line">            application_iter = <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        execute(self.server.app)</div><div class="line">    <span class="keyword">except</span> (socket.error, socket.timeout) <span class="keyword">as</span> e:</div><div class="line">        self.connection_dropped(e, environ)</div><div class="line">    <span class="keyword">except</span> Exception:</div><div class="line">        <span class="keyword">if</span> self.server.passthrough_errors:</div><div class="line">            <span class="keyword">raise</span></div><div class="line">        <span class="keyword">from</span> werkzeug.debug.tbtools <span class="keyword">import</span> get_current_traceback</div><div class="line">        traceback = get_current_traceback(ignore_system_exceptions=<span class="keyword">True</span>)</div><div class="line">        <span class="keyword">try</span>:</div><div class="line">            <span class="comment"># if we haven't yet sent the headers but they are set</span></div><div class="line">            <span class="comment"># we roll back to be able to set them again.</span></div><div class="line">            <span class="keyword">if</span> <span class="keyword">not</span> headers_sent:</div><div class="line">                <span class="keyword">del</span> headers_set[:]</div><div class="line">            execute(InternalServerError())</div><div class="line">        <span class="keyword">except</span> Exception:</div><div class="line">            <span class="keyword">pass</span></div><div class="line">        self.server.log(<span class="string">'error'</span>, <span class="string">'Error on request:\n%s'</span>,</div><div class="line">                        traceback.plaintext)</div></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li>《Python核心编程》</li>
+<li><a href="https://docs.python.org/2/howto/webservers.html#step-back-wsgi" target="_blank" rel="external">https://docs.python.org/2/howto/webservers.html#step-back-wsgi</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;WSGI(Web Server Gateway Interface) Web服务网关接口。&lt;/p&gt;
+&lt;p&gt;WSGI的目的替代CGI。CGI进程（类似Python解释器）针对每个请求进行创建，完成请求后退出。如果应程序接收树钱个请求，创建大量的语言解释器进程就会很快导致服务器
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>JSON resources</title>
+    <link href="http://blog.hotbaby.org/2017/05/16/json-protocols/"/>
+    <id>http://blog.hotbaby.org/2017/05/16/json-protocols/</id>
+    <published>2017-05-16T01:58:00.000Z</published>
+    <updated>2017-05-17T12:38:09.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>JSNO-RPC</strong></p>
+<p>A light weight remote procedure call protocol.</p>
+<p><strong>SJON API</strong></p>
+<p>A specification for building API in JSON.</p>
+<p><strong>JSONBIN</strong></p>
+<p>JSONbin.io is a simple JSON storage service for free.</p>
+<p><strong>jq</strong></p>
+<p>jq is a light-weight and flexible command-line JSON processor.</p>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="http://www.jsonrpc.org/" target="_blank" rel="external">JSON-RPC</a></li>
+<li><a href="https://stedolan.github.io/jq/" target="_blank" rel="external">jq</a></li>
+<li><a href="https://jsonbin.io/" target="_blank" rel="external">jsonbin</a></li>
+<li><a href="http://jsonapi.org/" target="_blank" rel="external">jsonapi</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;JSNO-RPC&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A light weight remote procedure call protocol.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;SJON API&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A specification f
+    
+    </summary>
+    
+    
+      <category term="json" scheme="http://blog.hotbaby.org/tags/json/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Flask signal</title>
+    <link href="http://blog.hotbaby.org/2017/05/14/Flask-signal/"/>
+    <id>http://blog.hotbaby.org/2017/05/14/Flask-signal/</id>
+    <published>2017-05-14T08:50:08.000Z</published>
+    <updated>2017-05-17T03:23:44.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Flask signals 默认没有自己实现signal，而是使用blink进行信号的定义，连接，分发。</p>
+<h2 id="Flask-singal"><a href="#Flask-singal" class="headerlink" title="Flask singal"></a>Flask singal</h2><p>flask未实现自己信号处理,而是使用blink.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">signals_available = <span class="keyword">False</span></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">from</span> blinker <span class="keyword">import</span> Namespace</div><div class="line">    signals_available = <span class="keyword">True</span></div><div class="line"><span class="keyword">except</span> ImportError:</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Namespace</span><span class="params">(object)</span>:</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">signal</span><span class="params">(self, name, doc=None)</span>:</span></div><div class="line">            <span class="keyword">return</span> _FakeSignal(name, doc)</div></pre></td></tr></table></figure>
+<p>flask 支持的信号 </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">_signals = Namespace()</div><div class="line"></div><div class="line"><span class="comment"># Core signals.  For usage examples grep the source code or consult</span></div><div class="line"><span class="comment"># the API documentation in docs/api.rst as well as docs/signals.rst</span></div><div class="line">template_rendered = _signals.signal(<span class="string">'template-rendered'</span>)</div><div class="line">before_render_template = _signals.signal(<span class="string">'before-render-template'</span>)</div><div class="line">request_started = _signals.signal(<span class="string">'request-started'</span>)</div><div class="line">request_finished = _signals.signal(<span class="string">'request-finished'</span>)</div><div class="line">request_tearing_down = _signals.signal(<span class="string">'request-tearing-down'</span>)</div><div class="line">got_request_exception = _signals.signal(<span class="string">'got-request-exception'</span>)</div><div class="line">appcontext_tearing_down = _signals.signal(<span class="string">'appcontext-tearing-down'</span>)</div><div class="line">appcontext_pushed = _signals.signal(<span class="string">'appcontext-pushed'</span>)</div><div class="line">appcontext_popped = _signals.signal(<span class="string">'appcontext-popped'</span>)</div><div class="line">message_flashed = _signals.signal(<span class="string">'message-flashed'</span>)</div></pre></td></tr></table></figure>
+<h2 id="Blinker-signal"><a href="#Blinker-signal" class="headerlink" title="Blinker signal"></a>Blinker signal</h2><p>blinker支持的特性:</p>
+<ul>
+<li>a global registry of named signals</li>
+<li>anonymous signals</li>
+<li>custom name registries</li>
+<li>permanently or temporarily connected receivers</li>
+<li>automically disconnected receivers via weak referencing</li>
+<li>sending arbirary data payloads</li>
+<li>collecting return values from signal receivers</li>
+<li>thread safety</li>
+</ul>
+<h3 id="Blinker-signal-sample"><a href="#Blinker-signal-sample" class="headerlink" title="Blinker signal sample"></a>Blinker signal sample</h3><p>TODO</p>
+<h3 id="Blinker-signal-realization"><a href="#Blinker-signal-realization" class="headerlink" title="Blinker signal realization"></a>Blinker signal realization</h3><p>TODO </p>
+<p>注册</p>
+<p>弱引用</p>
+<p>线程安全</p>
+<h2 id="Problems"><a href="#Problems" class="headerlink" title="Problems"></a>Problems</h2><p>connecter weak reference</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">register_signal_handlers</span><span class="params">(app)</span>:</span></div><div class="line">   <span class="keyword">import</span> logging</div><div class="line">   <span class="keyword">from</span> flask.signals <span class="keyword">import</span> request_finished</div><div class="line">   _logger = logging.getLogger(<span class="string">'api.debug'</span>)</div><div class="line">   </div><div class="line">   <span class="function"><span class="keyword">def</span> <span class="title">log_response</span><span class="params">(sender, response, **options)</span>:</span></div><div class="line">       print(response)</div><div class="line">   request_finished.connect(log_response, app)</div></pre></td></tr></table></figure>
+<p>以上代码，不能按原意正确的运行。因为log_response是局部作用域函数，在函数调用完成后，该作用域会消失，因此不能正确的调用<code>log_response</code>函数。</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://pythonhosted.org/blinker/" target="_blank" rel="external">https://pythonhosted.org/blinker/</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Flask signals 默认没有自己实现signal，而是使用blink进行信号的定义，连接，分发。&lt;/p&gt;
+&lt;h2 id=&quot;Flask-singal&quot;&gt;&lt;a href=&quot;#Flask-singal&quot; class=&quot;headerlink&quot; title=&quot;Flask si
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>nginx autoindex 乱码</title>
+    <link href="http://blog.hotbaby.org/2017/05/09/nginx-autoindex-%E4%B9%B1%E7%A0%81/"/>
+    <id>http://blog.hotbaby.org/2017/05/09/nginx-autoindex-乱码/</id>
+    <published>2017-05-09T17:01:00.000Z</published>
+    <updated>2017-05-15T02:22:10.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>使用nginx_autoindex_moudle检索本地文件时，如果文件名字包含中文，则会出现乱码.</p>
+<p>nginx配置文件如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">location /static/ &#123;</div><div class="line">alias $static/;        </div><div class="line">autoindex on;</div><div class="line">autoindex_exact_size on;</div><div class="line">autoindex_localtime on;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>检查发现nginx auto_index 生成的html文件header未包含<strong>charset</strong></p>
+<p>nginx 源码剖析</p>
+<p><code>src/http/modules/ngx_http_autoindex_module.c</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">switch</span> (format) &#123;</div><div class="line"></div><div class="line"><span class="keyword">case</span> NGX_HTTP_AUTOINDEX_JSON:</div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.content_type, <span class="string">"application/json"</span>);</div><div class="line">    <span class="keyword">break</span>;</div><div class="line"></div><div class="line"><span class="keyword">case</span> NGX_HTTP_AUTOINDEX_JSONP:</div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.content_type, <span class="string">"application/javascript"</span>);</div><div class="line">    <span class="keyword">break</span>;</div><div class="line"></div><div class="line"><span class="keyword">case</span> NGX_HTTP_AUTOINDEX_XML:</div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.content_type, <span class="string">"text/xml"</span>);</div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.charset, <span class="string">"utf-8"</span>);</div><div class="line">    <span class="keyword">break</span>;</div><div class="line"></div><div class="line"><span class="keyword">default</span>: <span class="comment">/* NGX_HTTP_AUTOINDEX_HTML */</span></div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.content_type, <span class="string">"text/html"</span>);</div><div class="line">    <span class="keyword">break</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>确认<strong>autoindex_format</strong>为html时，确实未增加charset的http头部信息。</p>
+<p>修改源代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">default</span>: <span class="comment">/* NGX_HTTP_AUTOINDEX_HTML */</span></div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.content_type, <span class="string">"text/html"</span>);</div><div class="line">    ngx_str_set(&amp;r-&gt;headers_out.charset, <span class="string">"utf-8"</span>);</div><div class="line">    <span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>重新编译nginx</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ ./configure --prefix=/opt/nginx --with-http_ssl_module</div><div class="line">$ make; make install</div></pre></td></tr></table></figure>
+<p>重启nginx</p>
+<p>强制刷新页面， OK, 问题解决</p>
+<p> <em>An official read-only mirror of <a href="http://hg.nginx.org/nginx/" target="_blank" rel="external">http://hg.nginx.org/nginx/</a> which is updated hourly. Pull requests on GitHub cannot be accepted and will be automatically closed. The proper way to submit changes to nginx is via the nginx development mailing list, see <a href="http://nginx.org/en/docs/contributing_changes.html" target="_blank" rel="external">http://nginx.org/en/docs/contributing_changes.html</a> <a href="http://nginx.org/" target="_blank" rel="external">http://nginx.org/</a></em></p>
+<p> nginx 不支持github pull request. Fuck</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://github.com/nginx/nginx" target="_blank" rel="external">nginx github repo</a></li>
+<li><a href="https://nginx.org/en/docs/http/ngx_http_autoindex_module.html" target="_blank" rel="external">nginx autoindex module document</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;使用nginx_autoindex_moudle检索本地文件时，如果文件名字包含中文，则会出现乱码.&lt;/p&gt;
+&lt;p&gt;nginx配置文件如下&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;
+    
+    </summary>
+    
+    
+      <category term="nginx" scheme="http://blog.hotbaby.org/tags/nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Shadowsocks</title>
+    <link href="http://blog.hotbaby.org/2017/05/08/shadowsocks/"/>
+    <id>http://blog.hotbaby.org/2017/05/08/shadowsocks/</id>
+    <published>2017-05-08T00:07:00.000Z</published>
+    <updated>2017-05-10T16:51:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>shadowsocks  科学上网解决方案</p>
+<h2 id="Shadowsocks-Server"><a href="#Shadowsocks-Server" class="headerlink" title="Shadowsocks Server"></a>Shadowsocks Server</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p><code>pip install shadowsocks==2.1.0</code></p>
+<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p><code>cat /etc/shadowsocks/config.json</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;server&quot;:&quot;ip address&quot;,</div><div class="line">    &quot;server_port&quot;:8388,</div><div class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</div><div class="line">    &quot;local_port&quot;:1080,</div><div class="line">    &quot;password&quot;:&quot;password&quot;,</div><div class="line">    &quot;timeout&quot;:300,</div><div class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</div><div class="line">    &quot;fast_open&quot;: false,</div><div class="line">    &quot;workers&quot;: 1</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h3><p><code>/usr/bin/ssserver -c /etc/shadowsocks/config.json</code></p>
+<h3 id="Boot-Script"><a href="#Boot-Script" class="headerlink" title="Boot Script"></a>Boot Script</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">#! /bin/sh</div><div class="line"></div><div class="line">set -e</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line">DESC=&quot;shadowsocks daemon&quot;</div><div class="line">NAME=shadowsocks</div><div class="line">DAEMON=/usr/bin/ssserver</div><div class="line">SCRIPTNAME=/etc/init.d/shadowsocks</div><div class="line"></div><div class="line"># If the daemon file is not found, terminate the script.</div><div class="line">test -x $DAEMON || exit 0</div><div class="line"></div><div class="line">d_start() &#123;</div><div class="line">  $DAEMON -c /etc/shadowsocks/config.json &gt;&gt; /var/log/shadowsocks.log 2&gt;&amp;1 &amp; </div><div class="line">  echo -n &quot; already running&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">d_stop() &#123;</div><div class="line">  killall ssserver || echo -n &quot; not running&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">case &quot;$1&quot; in</div><div class="line">  start)</div><div class="line">    echo -n &quot;Starting $DESC: $NAME&quot;</div><div class="line">    d_start</div><div class="line">    echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  stop)</div><div class="line">    echo -n &quot;Stopping $DESC: $NAME&quot;</div><div class="line">    d_stop</div><div class="line">    echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  restart)</div><div class="line">  echo -n &quot;Restarting $DESC: $NAME&quot;</div><div class="line">  d_stop</div><div class="line"># Sleep for two seconds before starting again, this should give the</div><div class="line"># Nginx daemon some time to perform a graceful stop.</div><div class="line">  sleep 2</div><div class="line">  d_start</div><div class="line">  echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  *)</div><div class="line">  echo &quot;Usage: $SCRIPTNAME &#123;start|stop|restart&#125;&quot; &gt;&amp;2</div><div class="line">  exit 3</div><div class="line">  ;;</div><div class="line">esac</div><div class="line">exit 0</div></pre></td></tr></table></figure>
+<p>done</p>
+<h2 id="Shadowsocks-Client"><a href="#Shadowsocks-Client" class="headerlink" title="Shadowsocks Client"></a>Shadowsocks Client</h2><h3 id="Linux-Client"><a href="#Linux-Client" class="headerlink" title="Linux Client"></a>Linux Client</h3><p><strong>download shadowsocks linux client</strong></p>
+<p><a href="https://jaist.dl.sourceforge.net/project/shadowsocksgui/dist/shadowsocks-gui-0.6.4-linux-x64.tar.xz" target="_blank" rel="external">shadowsocks download</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">tar xvf shadowsocks-gui*.tar.gz</div><div class="line">mv shadowsocks-gui /opt/shadowsocks/</div></pre></td></tr></table></figure>
+<p><strong>config linux application</strong></p>
+<p><code>/usr/share/applications/shadowsocks.desktop</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[Desktop Entry]</div><div class="line">Version=1.0</div><div class="line">Name=shadowsocks</div><div class="line">Exec=/opt/shadowsocks/start.sh</div><div class="line">Terminal=false</div><div class="line">#Icon=/opt/eclipse/icon.xpm</div><div class="line">Type=Application</div><div class="line">Categories=Development</div></pre></td></tr></table></figure>
+<p><strong>run</strong></p>
+<p>搜索 shadowsocks, 点击运行</p>
+<h3 id="Android-Client"><a href="#Android-Client" class="headerlink" title="Android Client"></a>Android Client</h3><p>直接下载apk安装、配置即可。</p>
+<h3 id="Terminal"><a href="#Terminal" class="headerlink" title="Terminal"></a>Terminal</h3><p>安装polipo</p>
+<p><code>sudo apt-get install polipo</code></p>
+<p>配置polipo</p>
+<p><code>/etc/polipo/config</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">socksParentProxy = &quot;127.0.0.1:1080&quot;</div><div class="line">socksProxyType = socks5</div><div class="line"></div><div class="line">logSyslog = true</div><div class="line">logFile = /var/log/polipo/polipo.log</div></pre></td></tr></table></figure>
+<p>启动polipo</p>
+<p><code>sudo polipo</code></p>
+<p>配置终端代理</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> http_proxy=127.0.0.1:8123</div><div class="line"><span class="built_in">export</span> https_proxy=127.0.0.1:8123</div></pre></td></tr></table></figure>
+<p>验证代理<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://www.google.com/</div></pre></td></tr></table></figure></p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://github.com/shadowsocks/shadowsocks/wiki" target="_blank" rel="external">shadowsocks wiki</a></li>
+<li><a href="https://github.com/shadowsocks/shadowsocks-android/releases" target="_blank" rel="external">shadowsocks android application</a></li>
+<li><a href="https://jaist.dl.sourceforge.net/project/shadowsocksgui/dist/shadowsocks-gui-0.6.4-linux-x64.tar.xz" target="_blank" rel="external">shadowsocks linux client</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;shadowsocks  科学上网解决方案&lt;/p&gt;
+&lt;h2 id=&quot;Shadowsocks-Server&quot;&gt;&lt;a href=&quot;#Shadowsocks-Server&quot; class=&quot;headerlink&quot; title=&quot;Shadowsocks Server&quot;&gt;&lt;/a&gt;Sha
+    
+    </summary>
+    
+    
+      <category term="shadowsocks" scheme="http://blog.hotbaby.org/tags/shadowsocks/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>McFarland</title>
+    <link href="http://blog.hotbaby.org/2017/05/01/McFarland/"/>
+    <id>http://blog.hotbaby.org/2017/05/01/McFarland/</id>
+    <published>2017-05-01T15:37:00.000Z</published>
+    <updated>2017-05-15T02:23:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>MacFarland movie lines.</p>
+<p>We fly like black birds through the orange groves.</p>
+<p>When we run, we own the earth. The land is ours, we speak the birds’s language. Not immigrants no more, Not stupid Mexicans.</p>
+<p>When we run, our spirits fly. We speak to the gods.</p>
+<p>When we run, we are the gods.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;MacFarland movie lines.&lt;/p&gt;
+&lt;p&gt;We fly like black birds through the orange groves.&lt;/p&gt;
+&lt;p&gt;When we run, we own the earth. The land is ours,
+    
+    </summary>
+    
+    
+      <category term="电影" scheme="http://blog.hotbaby.org/tags/%E7%94%B5%E5%BD%B1/"/>
+    
+      <category term="跑步" scheme="http://blog.hotbaby.org/tags/%E8%B7%91%E6%AD%A5/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hacker ethic</title>
+    <link href="http://blog.hotbaby.org/2017/04/28/%E9%BB%91%E5%AE%A2%E4%BC%A6%E7%90%86/"/>
+    <id>http://blog.hotbaby.org/2017/04/28/黑客伦理/</id>
+    <published>2017-04-28T09:29:44.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>hacker ethic</p>
+<ol>
+<li>Access to computers and anything that might teach you something about the way the world works - should be unlimited and total. Always yield to the hands-on imperative.</li>
+<li>All information should be free.</li>
+<li>Mitrust Authority, Promote Decentralization.</li>
+<li>Hackers should be judged by their hacking, not bogus criteria such as degrees, age, race or position.</li>
+<li>You can create art and beauty on a computer.</li>
+<li>Computers can change your life for the better.</li>
+</ol>
+<p>黑客伦理</p>
+<ol>
+<li>使用计算机以及所有有助于了解这个世界本质的事物都不应该受到任何限制。任何事情都应该亲手尝试。</li>
+<li>信息应该全部免费。</li>
+<li>不信任权威，提倡去中心化。</li>
+<li>判断一名黑客的水平应该看他的技术能力，而不是他的学历、年龄或地位等其他标准。</li>
+<li>你可以使用计算机创造美和艺术。</li>
+<li>计算机可以使你的生活更好。</li>
+</ol>
+<p>黑客伦理的核心价值观：分享、开放、民主、计算机的自由使用和进步。</p>
+<p>为黑客正名，黑客都是高智商，具有探索精神，能力超群，10X的大神级别的程序员。黑客创造了Unix、Linux, 黑客创建了Microsoft 、Google、Facebook，黑客编写了《计算机程序设计艺术》等等。和建筑师一样，黑客create the world。</p>
+<p>write the code and change the world.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;hacker ethic&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Access to computers and anything that might teach you something about the way the world works - should be unlim
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Git</title>
+    <link href="http://blog.hotbaby.org/2017/04/19/git/"/>
+    <id>http://blog.hotbaby.org/2017/04/19/git/</id>
+    <published>2017-04-19T10:31:00.000Z</published>
+    <updated>2017-05-16T07:54:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed and efficiency.</p>
+<h2 id="custom-domain-redirect"><a href="#custom-domain-redirect" class="headerlink" title="custom domain redirect"></a>custom domain redirect</h2><p>添加DNS解析记录：</p>
+<table>
+<thead>
+<tr>
+<th>记录类型</th>
+<th>主机记录</th>
+<th>记录值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CNAME</td>
+<td>blog</td>
+<td>hotbaby.github.io</td>
+</tr>
+</tbody>
+</table>
+<p>修改GitHub pages CNAME记录：</p>
+<p>创建CNAME文件，并写入域名。 比如<code>echo &#39;blog.mengyangyang.org&#39; &gt;&gt; CNAME</code></p>
+<p>hexo 更新覆盖CNAME:</p>
+<p>在<code>source</code>目录下创建CNAME文件，并写入域名</p>
+<h2 id="submodule"><a href="#submodule" class="headerlink" title="submodule"></a>submodule</h2><p>以引用PCI项目为例，介绍如何添加子模块</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ git <span class="built_in">clone</span> git@github.com:hotbaby/PCI.git</div><div class="line">$ git submodule add https://github.com/uolter/PCI.git code/origin</div><div class="line">$ git commit -m <span class="string">'Add PCI submodule.'</span></div><div class="line">$ git push</div></pre></td></tr></table></figure>
+<h2 id="tag"><a href="#tag" class="headerlink" title="tag"></a>tag</h2><p>添加tag</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git tag tag_name</div><div class="line">$ git push origin tag_name</div><div class="line">$ git push origin --tags</div></pre></td></tr></table></figure>
+<p>某次提交打tag</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git tag <span class="_">-a</span> tag_name commit_id</div><div class="line">$ git push origin tag_name</div><div class="line">$ git push origin --tags <span class="comment"># 全部tags</span></div></pre></td></tr></table></figure>
+<p>查看tag</p>
+<p><code>git tag --list</code></p>
+<p>切换到tag</p>
+<p><code>git check tag_name</code></p>
+<p>删除tag<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git tag <span class="_">-d</span> tag_name <span class="comment">#删除本地tag</span></div><div class="line">$ git push  origin --delete tag &lt;tag_name&gt; <span class="comment">#删除服务器tag</span></div></pre></td></tr></table></figure></p>
+<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ul>
+<li><a href="https://git-scm.com/book/zh/v1/Git-%E5%B7%A5%E5%85%B7-%E5%AD%90%E6%A8%A1%E5%9D%97" target="_blank" rel="external">Git子模块</a></li>
+<li><a href="http://wonux.tech/git-git-submodule.html" target="_blank" rel="external">Git子模块引用外部项目</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed
+    
+    </summary>
+    
+    
+      <category term="git" scheme="http://blog.hotbaby.org/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Djaong cache</title>
+    <link href="http://blog.hotbaby.org/2017/04/06/djaong-cache/"/>
+    <id>http://blog.hotbaby.org/2017/04/06/djaong-cache/</id>
+    <published>2017-04-06T19:43:00.000Z</published>
+    <updated>2017-05-17T12:10:32.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>每次用户请求一个页面，Web服务器都要进行很多计算，查询数据库，合成模板，处理业务逻辑等，再将页面返回给用户．后续的相同资源的请求，服务器都需要重复这些计算．</p>
+<p>django提供了缓存机制，每次将资源的响应的副本存储指定的位置，下次用户再发起相同的请求时，服务器不再需要进行类似的计算，直接将上次响应的副本返回给用户．这样既减少服务器的负载，又降低用户的请求时延，提高了用户体验．</p>
+<h2 id="HTTP缓存介绍"><a href="#HTTP缓存介绍" class="headerlink" title="HTTP缓存介绍"></a>HTTP缓存介绍</h2><p>TODO</p>
+<h2 id="缓存框架"><a href="#缓存框架" class="headerlink" title="缓存框架"></a>缓存框架</h2><p>缓存是django的一个核心组件，提供缓存服务。</p>
+<h3 id="缓存实现"><a href="#缓存实现" class="headerlink" title="缓存实现"></a>缓存实现</h3><p><img src="https://github.com/hotbaby/cache/blob/master/django_cache/resources/django-cache.png?raw=true" alt=""></p>
+<p><strong>config cache</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">settings.CACHES = &#123;</div><div class="line">    <span class="string">'default'</span>: &#123;  </div><div class="line">        <span class="string">'BACKEND'</span>:<span class="string">'django.core.cache.backends.memcached.MemcachedCache'</span>,</div><div class="line">        <span class="string">'LOCATION'</span>: <span class="string">'127.0.0.1:11211'</span>,</div><div class="line">    &#125;,</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以memcached为例介绍缓存的配置，<code>BACKEND</code>是缓存实例实现类，<code>LOCATION</code>是缓存实例的位置．</p>
+<h4 id="CacheHandler"><a href="#CacheHandler" class="headerlink" title="CacheHandler"></a>CacheHandler</h4><p><code>CacheHandler</code>管理缓存实例的访问。</p>
+<p>实现原理： 根据<code>settings.CACHES</code>中配置（运行时）创建缓存实例，重载<code>__getitem__</code>特殊方法管理缓存实例的访问，通过线程局部变量<code>thread.local()</code>保证对于<code>settings.CACHES</code>中每个缓存在每个线程中只有一个实例．</p>
+<p><code>django.core.cache.caches</code> 是<code>CacheHandler</code>的一个实例，<code>django.core.cache.cache</code> 是<code>caches[&#39;default&#39;]</code>的代理．</p>
+<h4 id="缓存backends"><a href="#缓存backends" class="headerlink" title="缓存backends"></a>缓存backends</h4><p>采用模板方法的设计模式，通过抽象基类<code>BaseCache</code>声明了一套缓存操作接口，而将接口实现延迟到具体的子类中。如图所示：<br><img src="https://github.com/hotbaby/cache/blob/master/django_cache/resources/django-cache-backends.png?raw=true" alt=""></p>
+<p><code>BaseCache</code> 是一个抽象类，定义了缓存通用的操作接口和参数默认值．</p>
+<p>其中重要的参数：</p>
+<ul>
+<li><code>key</code> 生成机制</li>
+<li><code>timeout</code> 超时时间</li>
+<li><code>max_entries</code> 最大条目数</li>
+<li><code>cull_frequency</code> 更新频率</li>
+</ul>
+<p><code>MemcachedCache</code>实现抽象类中声明的接口，通过<code>_cache</code>实现数据的设置和获取操作．</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@property</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">_cache</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Implements transparent thread-safe access to a memcached client.</div><div class="line">    """</div><div class="line">    <span class="keyword">if</span> getattr(self, <span class="string">'_client'</span>, <span class="keyword">None</span>) <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        self._client = self._lib.Client(self._servers)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> self._client</div></pre></td></tr></table></figure>
+<p><code>LocMemCache</code>实现了线程安全本地内存缓存．</p>
+<p>实现原理：<code>_cache</code>一个字典对象用于缓存内存对象，<code>_expire_info</code>一个字典对象用于缓存内存对象的过期时间，<code>_lock</code>是django内部实现一个读写锁保证线程安全．在存储和获取内存对象时，通过<code>pickle</code>进行对象的序列化和反序列化．</p>
+<p><code>FileBasedCache</code>实现了基于文件的缓存机制．</p>
+<p>实现原理： 缓存对象，将过期时间和内存对象通过<code>pickle</code>序列化后写入本地文件系统．获取对象，检查是否需要删除就的对象，反序列化，检查是否过期，返回对象．</p>
+<h3 id="缓存中间件"><a href="#缓存中间件" class="headerlink" title="缓存中间件"></a>缓存中间件</h3><p>如果使能缓存中间件，每个django的页面都会被缓存．</p>
+<p>缓存中间件的工作原理（参考实现代码）：</p>
+<ul>
+<li>只有状态码为200的，方法为HEAD,GET请求的响应被缓存</li>
+<li>检测缓存中是否已缓存该请求的响应对象</li>
+<li>如果命中，返回原始响应对象的一个浅拷贝（shallow copy）</li>
+<li>如果未命中，继续处理view函数</li>
+<li>根据请求的header决定是否需要缓存</li>
+<li>设置响应的ETag, Last-Modified, Expires, Cache-Control HTTP header.</li>
+</ul>
+<p>配置缓存中间件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">settings.MIDDLEWARE = [</div><div class="line">    <span class="string">'django.middleware.cache.UpdateCacheMiddleware'</span>,</div><div class="line">    ...</div><div class="line">    <span class="string">'django.middleware.cache.FetchFromCacheMiddleware'</span>,</div><div class="line">]</div></pre></td></tr></table></figure>
+<p><strong>注意：</strong></p>
+<p>在response阶段，中间件的处理顺序是bottom-top, <code>UPdateCacheMiddleware</code>必须最后被执行，因此放在靠前的位置．在request阶段，中间件的处理顺序是top-bottom, <code>FetchFromCacheMiddleware</code>必须最后被执行，因此放在靠后的位置．<br><img src="https://github.com/hotbaby/cache/blob/master/django_cache/resources/django-middleware-ordering.png?raw=true" alt=""></p>
+<h4 id="FetchFromCacheMiddleware"><a href="#FetchFromCacheMiddleware" class="headerlink" title="FetchFromCacheMiddleware"></a><code>FetchFromCacheMiddleware</code></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span></div><div class="line">      <span class="string">"""</span></div><div class="line">      Checks whether the page is already cached and returns the cached</div><div class="line">      version if available.</div><div class="line">      """</div><div class="line">        <span class="comment"># 只缓存HEAD, GET的请求</span></div><div class="line">        <span class="keyword">if</span> request.method <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'GET'</span>, <span class="string">'HEAD'</span>):</div><div class="line">          request._cache_update_cache = <span class="keyword">False</span></div><div class="line">          <span class="keyword">return</span> <span class="keyword">None</span>  <span class="comment"># Don't bother checking the cache.</span></div><div class="line"></div><div class="line"><span class="comment"># 获取GET方法的cache_key,如果不存在，则设置_cache_update_cache标志位为True，需要更新缓存</span></div><div class="line">        <span class="comment"># try and get the cached GET response</span></div><div class="line">      cache_key = get_cache_key(request, self.key_prefix, <span class="string">'GET'</span>, cache=self.cache)</div><div class="line">      <span class="keyword">if</span> cache_key <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">          request._cache_update_cache = <span class="keyword">True</span></div><div class="line">          <span class="keyword">return</span> <span class="keyword">None</span>  <span class="comment"># No cache information available, need to rebuild.</span></div><div class="line">      response = self.cache.get(cache_key)</div><div class="line">        <span class="comment"># 如果cache为命中，而且请求的方法为HEAD,则获取请求方法为HEAD的cache_key</span></div><div class="line">        <span class="comment"># if it wasn't found and we are looking for a HEAD, try looking just for that</span></div><div class="line">      <span class="keyword">if</span> response <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">and</span> request.method == <span class="string">'HEAD'</span>:</div><div class="line">          cache_key = get_cache_key(request, self.key_prefix, <span class="string">'HEAD'</span>, cache=self.cache)</div><div class="line">          response = self.cache.get(cache_key)</div><div class="line"></div><div class="line"><span class="comment"># 缓存都未命中，设置_cache_update_cache标志位为True,调用view函数，并更新缓存</span></div><div class="line">        <span class="keyword">if</span> response <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">          request._cache_update_cache = <span class="keyword">True</span></div><div class="line">          <span class="keyword">return</span> <span class="keyword">None</span>  <span class="comment"># No cache information available, need to rebuild.</span></div><div class="line"></div><div class="line"><span class="comment"># 缓存命中，设置_cache_update_cahe标志为False, 不调用view函数，不更新缓存</span></div><div class="line">        <span class="comment"># hit, return cached response</span></div><div class="line">      request._cache_update_cache = <span class="keyword">False</span></div><div class="line">      <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<h4 id="UpdateCacheMiddleware"><a href="#UpdateCacheMiddleware" class="headerlink" title="UpdateCacheMiddleware"></a><code>UpdateCacheMiddleware</code></h4><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_should_update_cache</span><span class="params">(self, request, response)</span>:</span></div><div class="line">      <span class="keyword">return</span> hasattr(request, <span class="string">'_cache_update_cache'</span>) <span class="keyword">and</span> request._cache_update_cache</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">def</span> <span class="title">process_response</span><span class="params">(self, request, response)</span>:</span></div><div class="line">      <span class="string">"""Sets the cache, if needed."""</span></div><div class="line">        <span class="comment"># 不缓存，直接返回Response</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self._should_update_cache(request, response):</div><div class="line">          <span class="comment"># We don't need to update the cache, just return.</span></div><div class="line">          <span class="keyword">return</span> response</div><div class="line"></div><div class="line"><span class="comment"># 如果是流数据或状态码不为200, 不缓存</span></div><div class="line">        <span class="keyword">if</span> response.streaming <span class="keyword">or</span> response.status_code != <span class="number">200</span>:</div><div class="line">          <span class="keyword">return</span> response</div><div class="line"></div><div class="line"><span class="comment"># 如果是私有数据，不缓存</span></div><div class="line">        <span class="comment"># Don't cache responses that set a user-specific (and maybe security</span></div><div class="line">      <span class="comment"># sensitive) cookie in response to a cookie-less request.</span></div><div class="line">      <span class="keyword">if</span> <span class="keyword">not</span> request.COOKIES <span class="keyword">and</span> response.cookies <span class="keyword">and</span> has_vary_header(response, <span class="string">'Cookie'</span>):</div><div class="line">          <span class="keyword">return</span> response</div><div class="line"></div><div class="line">      <span class="comment"># Try to get the timeout from the "max-age" section of the "Cache-</span></div><div class="line">      <span class="comment"># Control" header before reverting to using the default cache_timeout</span></div><div class="line">      <span class="comment"># length.</span></div><div class="line">      timeout = get_max_age(response)</div><div class="line">      <span class="keyword">if</span> timeout <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">          timeout = self.cache_timeout</div><div class="line">      <span class="keyword">elif</span> timeout == <span class="number">0</span>:</div><div class="line">          <span class="comment"># max-age was set to 0, don't bother caching.</span></div><div class="line">          <span class="keyword">return</span> response</div><div class="line">      </div><div class="line">        <span class="comment"># 设置缓存的HTTP头部信息</span></div><div class="line">        patch_response_headers(response, timeout)</div><div class="line">        <span class="comment"># 缓存响应</span></div><div class="line">        <span class="keyword">if</span> timeout:</div><div class="line">          cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)</div><div class="line">          <span class="keyword">if</span> hasattr(response, <span class="string">'render'</span>) <span class="keyword">and</span> callable(response.render):</div><div class="line">              response.add_post_render_callback(</div><div class="line">                  <span class="keyword">lambda</span> r: self.cache.set(cache_key, r, timeout)</div><div class="line">              )</div><div class="line">          <span class="keyword">else</span>:</div><div class="line">              self.cache.set(cache_key, response, timeout)</div><div class="line">      <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<h3 id="缓存装饰器"><a href="#缓存装饰器" class="headerlink" title="缓存装饰器"></a>缓存装饰器</h3><p>缓存装饰器用于控制view是否缓存.</p>
+<h4 id="nerver-cache"><a href="#nerver-cache" class="headerlink" title="nerver_cache"></a>nerver_cache</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">never_cache</span><span class="params">(view_func)</span>:</span></div><div class="line"><span class="meta">    @wraps(view_func, assigned=available_attrs(view_func))</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_wrapped_view_func</span><span class="params">(request, *args, **kwargs)</span>:</span></div><div class="line">        response = view_func(request, *args, **kwargs)</div><div class="line">        add_never_cache_headers(response)</div><div class="line">        <span class="keyword">return</span> response</div><div class="line">    <span class="keyword">return</span> _wrapped_view_func</div></pre></td></tr></table></figure>
+<p>view装饰器，在view函数处理完成后，patch缓存相关的HTTP头，控制该相应不被缓存。</p>
+<p>相关的HTTP headers:</p>
+<ul>
+<li>Last-Modifed: current_datetime</li>
+<li>Expires: current_datetime</li>
+<li>Cache-Control: max-age=0</li>
+</ul>
+<h4 id="cache-control"><a href="#cache-control" class="headerlink" title="cache_control"></a>cache_control</h4><p>view装饰器，在view函数处理完成后，patch<code>Cache-Control</code>HTTP头。</p>
+<h4 id="cache-page"><a href="#cache-page" class="headerlink" title="cache_page"></a>cache_page</h4><p>view装饰器，用于缓存页面。该装饰器是对cache中间件<code>CacheMiddleware</code>的封装。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://docs.djangoproject.com/en/1.11/topics/cache/#the-low-level-cache-api" target="_blank" rel="external">django’s cache framework</a></li>
+<li><a href="http://django-redis-chs.readthedocs.io/zh_CN/latest/" target="_blank" rel="external">django redis</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="external">rfc7234  Hypertext Transfer Protocol (HTTP/1.1): Caching</a></li>
+<li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
+<li><a href="https://github.com/django/django/tree/master/django/core/cache" target="_blank" rel="external">django core cache code</a></li>
+<li><a href="https://docs.python.org/2/library/pickle.html" target="_blank" rel="external">python pickle library</a></li>
+<li><a href="https://docs.python.org/2/library/threading.html#threading.local" target="_blank" rel="external">python threading.local</a></li>
+<li><a href="https://docs.djangoproject.com/en/1.10/ref/middleware/#middleware-ordering" target="_blank" rel="external">django middleware ordering</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;每次用户请求一个页面，Web服务器都要进行很多计算，查询数据库，合成模板，处理业务逻辑等，再将页面返回给用户．后续的相同资源的请求，服务器都需要重复这些计算．&lt;/p&gt;
+&lt;p&gt;django提供了缓存机制，每次将资源的响应的副本存储指定的位置，下次用户再发起相同的请求时，服务器
+    
+    </summary>
+    
+      <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+      <category term="cache" scheme="http://blog.hotbaby.org/tags/cache/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RSS feed</title>
+    <link href="http://blog.hotbaby.org/2017/04/01/RSS-feed/"/>
+    <id>http://blog.hotbaby.org/2017/04/01/RSS-feed/</id>
+    <published>2017-04-01T23:39:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>优秀的RSS feed订阅源，其中包括大数据，Python，跑步，新闻等。</p>
+<p>feed 列表：</p>
+<ul>
+<li><a href="http://feeds.feedburner.com/ProgrammableWeb" target="_blank" rel="external">ProgrammableWeb</a></li>
+<li><a href="http://www.douban.com/feed/group/python/discussion" target="_blank" rel="external">豆瓣：Python编程小组</a></li>
+<li><a href="http://www.runningshoesguru.com/feed/" target="_blank" rel="external">Running Shoes</a></li>
+<li><a href="http://www.36dsj.com/feed" target="_blank" rel="external">36大数据</a></li>
+<li><a href="http://dataunion.org/feed" target="_blank" rel="external">数盟社区</a></li>
+<li><a href="http://news.ycombinator.com/rss" target="_blank" rel="external">Hack News</a></li>
+<li><a href="http://feeds.appinn.com/appinns/" target="_blank" rel="external">小众软件</a></li>
+<li><a href="https://www.elastic.co/blog/feed/" target="_blank" rel="external">elasticsearch</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;优秀的RSS feed订阅源，其中包括大数据，Python，跑步，新闻等。&lt;/p&gt;
+&lt;p&gt;feed 列表：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://feeds.feedburner.com/ProgrammableWeb&quot; target=&quot;_blank&quot; 
+    
+    </summary>
+    
+    
+      <category term="RSS" scheme="http://blog.hotbaby.org/tags/RSS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Django debug</title>
+    <link href="http://blog.hotbaby.org/2017/03/30/Django-debug/"/>
+    <id>http://blog.hotbaby.org/2017/03/30/Django-debug/</id>
+    <published>2017-03-30T20:19:00.000Z</published>
+    <updated>2017-05-17T12:10:58.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>django默认情况会将所有的错误信息以HTML形式返回给前端，这样导致在运行nose的单元测试用例出现错误时，无法看到详细的错误栈帧信息，给程序的debug带来一定的困扰。</p>
+<p>如何debug django异常栈帧？</p>
+<p>方法一: </p>
+<p>配置<code>settings.py</code>,将django的所有的debug信息，错误栈帧信息输出到终端</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">LOGGING = &#123;</div><div class="line">    <span class="string">'version'</span>: <span class="number">1</span>,</div><div class="line">    <span class="string">'disable_existing_loggers'</span>: <span class="keyword">False</span>,</div><div class="line">    <span class="string">'handlers'</span>: &#123;</div><div class="line">        <span class="string">'console'</span>: &#123;</div><div class="line">            <span class="string">'class'</span>: <span class="string">'logging.StreamHandler'</span>,</div><div class="line">        &#125;,</div><div class="line">    &#125;,</div><div class="line">    <span class="string">'loggers'</span>: &#123;</div><div class="line">        <span class="string">'django'</span>: &#123;</div><div class="line">            <span class="string">'handlers'</span>: [<span class="string">'console'</span>],</div><div class="line">            <span class="string">'level'</span>: os.getenv(<span class="string">'DJANGO_LOG_LEVEL'</span>, <span class="string">'INFO'</span>),</div><div class="line">        &#125;,</div><div class="line">    &#125;,</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>连接信号<code>got_request_exception</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> django.core.signals <span class="keyword">import</span> got_request_exception</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">exc_cb</span><span class="params">(sender, **kwargs)</span>:</span></div><div class="line">    <span class="keyword">import</span> traceback</div><div class="line">    traceback.print_exc()</div><div class="line"></div><div class="line">got_request_exception.connect(exc_cb)</div></pre></td></tr></table></figure>
+<p>方法二： 通过middleware，在<code>process_exception</code>中增加exception的调试信息，并将此middleware增加到<code>settings.py</code>的<code>MIDDLEWARE_CLASSES</code>中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> traceback</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LogMiddleware</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_exception</span><span class="params">(self, request, exception)</span>:</span></div><div class="line">        traceback.print_exc()</div></pre></td></tr></table></figure>
+<p><strong>注: 在中间件process_exception方法中打印异常栈帧，只能debug view函数的异常。 如果异常发生在中间件中，无法打印异常信息。</strong></p>
+<p><strong>参考</strong></p>
+<ul>
+<li><a href="https://docs.djangoproject.com/en/1.11/topics/logging/" target="_blank" rel="external">django logging</a></li>
+<li><a href="https://docs.djangoproject.com/en/1.11/topics/signals/" target="_blank" rel="external">django signals</a></li>
+<li><a href="https://docs.python.org/2/library/logging.html" target="_blank" rel="external">logging</a></li>
+<li><a href="https://docs.python.org/2/library/logging.config.html" target="_blank" rel="external">logging.config</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;django默认情况会将所有的错误信息以HTML形式返回给前端，这样导致在运行nose的单元测试用例出现错误时，无法看到详细的错误栈帧信息，给程序的debug带来一定的困扰。&lt;/p&gt;
+&lt;p&gt;如何debug django异常栈帧？&lt;/p&gt;
+&lt;p&gt;方法一: &lt;/p&gt;
+&lt;p&gt;配置
+    
+    </summary>
+    
+      <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Django middleware</title>
+    <link href="http://blog.hotbaby.org/2017/03/30/Django-Middleware/"/>
+    <id>http://blog.hotbaby.org/2017/03/30/Django-Middleware/</id>
+    <published>2017-03-30T11:04:00.000Z</published>
+    <updated>2017-05-17T12:11:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>中间件是django处理request/response钩子的框架。它是一个用来修改输入、输出的轻量级的插件系统。 从另外角度上讲，中间件也是一种特殊的“装饰器”，装饰所有的视图函数。</p>
+<h2 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h2><p>django中间件新版本与旧版本不兼容， 本文档是基于django 1.10编写。</p>
+<p><strong>新版本中间件</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewMiddlewareCls</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, get_response)</span>:</span></div><div class="line">        self.get_response = get_response</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request)</span>:</span></div><div class="line">        response = self.get_response(request)</div><div class="line">        <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<p><strong>旧版本中间件</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">OldMiddlewarCls</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span> <span class="keyword">pass</span></div></pre></td></tr></table></figure>
+<h2 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h2><h3 id="中间件示例"><a href="#中间件示例" class="headerlink" title="中间件示例"></a>中间件示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> django.utils.depreaction <span class="keyword">import</span> MiddlewareMixin</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleMiddleware</span><span class="params">(MiddlewareMixin)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_exceptions</span><span class="params">(self, request, exception)</span>:</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">None</span> <span class="comment"># or return HttpResponse()</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_response</span><span class="params">(self, request, response)</span>:</span></div><div class="line">        <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<h3 id="加载中间件"><a href="#加载中间件" class="headerlink" title="加载中间件"></a>加载中间件</h3><p><code>WSGIHandler</code>在初始化时加载中配置文件中的中间件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseHandler</span><span class="params">(object)</span>:</span></div><div class="line">    ...</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load_middleware</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> settings.MIDDLEWARE <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            ...</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            handler = convert_exception_to_response(self._get_response)</div><div class="line">            <span class="keyword">for</span> middleware_path <span class="keyword">in</span> reversed(settings.MIDDLEWARE):</div><div class="line">                middleware = import_string(middleware_path)</div><div class="line">                <span class="keyword">try</span>:</div><div class="line">                    mw_instance = middleware(handler)</div><div class="line">                <span class="keyword">except</span> MiddlewareNotUsed <span class="keyword">as</span> exc:</div><div class="line">                    <span class="keyword">if</span> settings.DEBUG:</div><div class="line">                        <span class="keyword">if</span> six.text_type(exc):</div><div class="line">                            logger.debug(<span class="string">'MiddlewareNotUsed(%r): %s'</span>, middleware_path, exc)</div><div class="line">                        <span class="keyword">else</span>:</div><div class="line">                            logger.debug(<span class="string">'MiddlewareNotUsed: %r'</span>, middleware_path)</div><div class="line">                    <span class="keyword">continue</span></div><div class="line"></div><div class="line">                <span class="keyword">if</span> mw_instance <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">                    <span class="keyword">raise</span> ImproperlyConfigured(</div><div class="line">                        <span class="string">'Middleware factory %s returned None.'</span> % middleware_path</div><div class="line">                    )</div><div class="line"></div><div class="line">                <span class="keyword">if</span> hasattr(mw_instance, <span class="string">'process_view'</span>):</div><div class="line">                    self._view_middleware.insert(<span class="number">0</span>, mw_instance.process_view)</div><div class="line">                <span class="keyword">if</span> hasattr(mw_instance, <span class="string">'process_template_response'</span>):</div><div class="line">                    self._template_response_middleware.append(mw_instance.process_template_response)</div><div class="line">                <span class="keyword">if</span> hasattr(mw_instance, <span class="string">'process_exception'</span>):</div><div class="line">                    self._exception_middleware.append(mw_instance.process_exception)</div><div class="line"></div><div class="line">                handler = convert_exception_to_response(mw_instance)</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIHandler</span><span class="params">(base.BaseHandler)</span>:</span></div><div class="line">    request_class = WSGIRequest</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">        super(WSGIHandler, self).__init__(*args, **kwargs)</div><div class="line">        self.load_middleware()</div></pre></td></tr></table></figure>
+<h3 id="运行中间件"><a href="#运行中间件" class="headerlink" title="运行中间件"></a>运行中间件</h3><p>收到客户端发起的一个请求，调用所有注册的中间件。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIHandler</span><span class="params">(base.BaseHandler)</span>:</span></div><div class="line">    ...</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, environ, start_response)</span>:</span></div><div class="line">        ...</div><div class="line">        response = self.get_response(request)</div><div class="line">        ...</div><div class="line">    ...</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseHandler</span><span class="params">(object)</span>:</span></div><div class="line">    ...</div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_response</span><span class="params">(self, request)</span>:</span></div><div class="line">        <span class="string">"""Return an HttpResponse object for the given HttpRequest."""</span></div><div class="line">        <span class="comment"># Setup default url resolver for this thread</span></div><div class="line">        set_urlconf(settings.ROOT_URLCONF)</div><div class="line"></div><div class="line">        response = self._middleware_chain(request)</div><div class="line"></div><div class="line">        <span class="comment"># This block is only needed for legacy MIDDLEWARE_CLASSES; if</span></div><div class="line">        <span class="comment"># MIDDLEWARE is used, self._response_middleware will be empty.</span></div><div class="line">        <span class="keyword">try</span>:</div><div class="line">            <span class="comment"># Apply response middleware, regardless of the response</span></div><div class="line">            <span class="keyword">for</span> middleware_method <span class="keyword">in</span> self._response_middleware:</div><div class="line">                response = middleware_method(request, response)</div><div class="line">                <span class="comment"># Complain if the response middleware returned None (a common error).</span></div><div class="line">                <span class="keyword">if</span> response <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">                    <span class="keyword">raise</span> ValueError(</div><div class="line">                        <span class="string">"%s.process_response didn't return an "</span></div><div class="line">                        <span class="string">"HttpResponse object. It returned None instead."</span></div><div class="line">                        % (middleware_method.__self__.__class__.__name__))</div><div class="line">        <span class="keyword">except</span> Exception:  <span class="comment"># Any exception should be gathered and handled</span></div><div class="line">            signals.got_request_exception.send(sender=self.__class__, request=request)</div><div class="line">            response = self.handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())</div><div class="line"></div><div class="line">        response._closable_objects.append(request)</div><div class="line"></div><div class="line">        <span class="comment"># If the exception handler returns a TemplateResponse that has not</span></div><div class="line">        <span class="comment"># been rendered, force it to be rendered.</span></div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> getattr(response, <span class="string">'is_rendered'</span>, <span class="keyword">True</span>) <span class="keyword">and</span> callable(getattr(response, <span class="string">'render'</span>, <span class="keyword">None</span>)):</div><div class="line">            response = response.render()</div><div class="line"></div><div class="line">        <span class="keyword">if</span> response.status_code == <span class="number">404</span>:</div><div class="line">            logger.warning(</div><div class="line">                <span class="string">'Not Found: %s'</span>, request.path,</div><div class="line">                extra=&#123;<span class="string">'status_code'</span>: <span class="number">404</span>, <span class="string">'request'</span>: request&#125;,</div><div class="line">            )</div><div class="line"></div><div class="line">        <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<h3 id="中间件chain"><a href="#中间件chain" class="headerlink" title="中间件chain"></a>中间件chain</h3><p>所有的中间件通过<code>MiddlewareMixin</code>链接起来，形成<code>middleware_chain</code>,参考<em>设计模式 chain of responsibility职责链</em>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MiddlewareMixin</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, get_response=None)</span>:</span></div><div class="line">        self.get_response = get_response</div><div class="line">        super(MiddlewareMixin, self).__init__()</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, request)</span>:</span></div><div class="line">        response = <span class="keyword">None</span></div><div class="line">        <span class="keyword">if</span> hasattr(self, <span class="string">'process_request'</span>):</div><div class="line">            response = self.process_request(request)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> response:</div><div class="line">            response = self.get_response(request)</div><div class="line">        <span class="keyword">if</span> hasattr(self, <span class="string">'process_response'</span>):</div><div class="line">            response = self.process_response(request, response)</div><div class="line">        <span class="keyword">return</span> response</div></pre></td></tr></table></figure>
+<p>新版本middleware处理时序：</p>
+<p><img src="/images/pasted-1.png" alt=""></p>
+<p>旧版版本middleware处理时序：<br><img src="https://docs.djangoproject.com/en/1.9/_images/middleware.svg" alt=""></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>如果<code>process_request</code>返回结果为不<code>None</code>, 则不再迭代调用下一个层中间件(或视图函数)。</p>
+<p>中间件处理分为几个阶段：</p>
+<ul>
+<li>process_request</li>
+<li>process_view</li>
+<li>process_exception</li>
+<li>process_template_response</li>
+<li>process_exception</li>
+<li>process_response</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://docs.djangoproject.com/en/1.10/topics/http/middleware/" target="_blank" rel="external">django middleware framework</a></li>
+<li><a href="https://github.com/django/deps/blob/master/final/0005-improved-middleware.rst" target="_blank" rel="external">DEP5 improved middleware</a></li>
+<li><em>设计模式-可复用面向对象基础</em></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;中间件是django处理request/response钩子的框架。它是一个用来修改输入、输出的轻量级的插件系统。 从另外角度上讲，中间件也是一种特殊的“装饰器”，装饰所有的视图函数。&lt;/p&gt;
+&lt;h2 id=&quot;版本说明&quot;&gt;&lt;a href=&quot;#版本说明&quot; class=&quot;hea
+    
+    </summary>
+    
+      <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python help functions</title>
+    <link href="http://blog.hotbaby.org/2017/03/29/Python-help-functions/"/>
+    <id>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</id>
+    <published>2017-03-29T15:13:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>介绍Python 标准库中常用函数。比如<code>map</code>,<code>functools.partial()</code> <code>functools.wraps()</code>, <code>itertools.chain()</code>等，减少重复造轮子，提高编码效率。</p>
+<h2 id="Python-Standard-Library"><a href="#Python-Standard-Library" class="headerlink" title="Python Standard Library"></a>Python Standard Library</h2><h3 id="built-in"><a href="#built-in" class="headerlink" title="built-in"></a>built-in</h3><h4 id="map"><a href="#map" class="headerlink" title="map()"></a>map()</h4><p><code>map(func, iterable)</code> 将函数应用于迭代对象中的每一个元素，返回应用之后结果列表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>l = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>map(<span class="keyword">lambda</span> x: str(x), l)</div><div class="line">[<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>]</div></pre></td></tr></table></figure>
+<h4 id="filter"><a href="#filter" class="headerlink" title="filter()"></a>filter()</h4><p><code>filter(func, iterable)</code> 将函数应用于可迭代对象中的每一个元素，<code>if func()</code>为真，则将该元素添加的返回的结果列表中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>l = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>filter(<span class="keyword">lambda</span> x: x%<span class="number">2</span>==<span class="number">0</span>, l)</div><div class="line">[<span class="number">2</span>, <span class="number">4</span>]</div></pre></td></tr></table></figure>
+<h3 id="functoos"><a href="#functoos" class="headerlink" title="functoos"></a>functoos</h3><p>可调用对象（callable object）的高阶函数、操作。通常来讲，任何可调用对象都可以看作一个函数。</p>
+<h4 id="functools-wraps"><a href="#functools-wraps" class="headerlink" title="functools.wraps()"></a><code>functools.wraps()</code></h4><p><code>wraps(wrapped[,assigned][,updated])</code><br>常用装饰器函数中返回的<code>wrapper()</code>函数，解决了被装饰函数__name__、__doc__等签名丢失问题。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> functools</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line"><span class="meta">	@functools.wrap(f)</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div></pre></td></tr></table></figure>
+<h4 id="functools-partial"><a href="#functools-partial" class="headerlink" title="functools.partial()"></a><code>functools.partial()</code></h4><p><code>partial(func[,*args][,**kwargs])</code><br>是一个装饰器函数，也是一个闭包，返回一个可调用对象，freeze一些参数。</p>
+<p>实现原理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">partial</span><span class="params">(func, *args, **keywords)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">newfunc</span><span class="params">(*fargs, **fkeywords)</span>:</span></div><div class="line">        newkeywords = keywords.copy()</div><div class="line">        newkeywords.update(fkeywords)</div><div class="line">        <span class="keyword">return</span> func(*(args + fargs), **newkeywords)</div><div class="line">    newfunc.func = func</div><div class="line">    newfunc.args = args</div><div class="line">    newfunc.keywords = keywords</div><div class="line">    <span class="keyword">return</span> newfunc</div></pre></td></tr></table></figure>
+<h3 id="itertools"><a href="#itertools" class="headerlink" title="itertools"></a>itertools</h3><h4 id="itertools-imap"><a href="#itertools-imap" class="headerlink" title="itertools.imap()"></a>itertools.imap()</h4><p><code>imap(func, *iterables)</code> 和iter和map混合体。</p>
+<p>工作原理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">myimap</span><span class="params">(func, *iterables)</span>:</span></div><div class="line">	iterables = map(iter,iterables)</div><div class="line">	<span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">		args = [next(it) <span class="keyword">for</span> it <span class="keyword">in</span> iterables]</div><div class="line">		<span class="keyword">yield</span> func(*args)</div><div class="line"></div><div class="line">		</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>[item <span class="keyword">for</span> item <span class="keyword">in</span> myimap(pow, (<span class="number">2</span>,<span class="number">2</span>), (<span class="number">3</span>,<span class="number">3</span>))]</div><div class="line">[<span class="number">8</span>, <span class="number">8</span>]</div></pre></td></tr></table></figure>
+<h4 id="itertools-chain"><a href="#itertools-chain" class="headerlink" title="itertools.chain()"></a>itertools.chain()</h4><p><code>chain(*iterables)</code> 返回一个迭代器，该迭代器依次返回可迭代对象中没一个元素。</p>
+<p>工作原理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">mychain</span><span class="params">(*iterables)</span>:</span></div><div class="line">	<span class="keyword">for</span> iter_ <span class="keyword">in</span> iterables:</div><div class="line">		<span class="keyword">for</span> item <span class="keyword">in</span> iter_:</div><div class="line">			<span class="keyword">yield</span> item</div><div class="line">			</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>[item <span class="keyword">for</span> item <span class="keyword">in</span> mychain(<span class="string">'abc'</span>, <span class="string">'def'</span>)]</div><div class="line">[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>, <span class="string">'e'</span>, <span class="string">'f'</span>]</div></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://docs.python.org/2/library/functions.html" target="_blank" rel="external">https://docs.python.org/2/library/functions.html</a></li>
+<li><a href="https://docs.python.org/2/library/functools.html" target="_blank" rel="external">https://docs.python.org/2/library/functools.html</a></li>
+<li><a href="https://docs.python.org/2/library/itertools.html" target="_blank" rel="external">https://docs.python.org/2/library/itertools.html</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;介绍Python 标准库中常用函数。比如&lt;code&gt;map&lt;/code&gt;,&lt;code&gt;functools.partial()&lt;/code&gt; &lt;code&gt;functools.wraps()&lt;/code&gt;, &lt;code&gt;itertools.chain()&lt;/code&gt;等，减少重
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python 装饰器</title>
+    <link href="http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/"/>
+    <id>http://blog.hotbaby.org/2017/03/28/Python-装饰器/</id>
+    <published>2017-03-28T00:00:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>装饰器是一种设计模型（结构型模式），可以动态给一个对象添加一些额外的职责，而不用修改该对象的任何code。</p>
+<p>比如，我们要给一个API增加权限认证，可以通过<code>auth_decorator()</code>装饰这个API，而不必修改每个API的代码；debug一个函数的耗时，可以实现一个<code>time_decorator()</code>装饰要这些函数，而不用修改这些函数的内部实现；给个<code>TextView()</code>增加滚动条的装饰器<code>ScrollDecorator()</code>；Flask使用<code>route()</code>装饰器进行路由的注册等等。</p>
+<p>装饰器优点：</p>
+<ul>
+<li>比静态继承更灵活。与静态继承相比，装饰器可以灵活向对象添加额外的责任</li>
+<li>避免在层次结构高层的类有特多的特征。 可以定义一个简单的类，通过装饰器给他逐渐添加功能。</li>
+</ul>
+<h2 id="基本装饰器"><a href="#基本装饰器" class="headerlink" title="基本装饰器"></a>基本装饰器</h2><p>Python从语法本身就支持装饰器，Python装饰器是一个可调用对象（比如，函数、类），接受一个函数对象作为输入，返回另外一个函数对象。</p>
+<p>最简单的Python函数装饰器：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		print(<span class="string">'before call %s'</span> % f.__name__)</div><div class="line">		result = f(*args, **kwargs)</div><div class="line">		print(<span class="string">'after call %s'</span> % f.__name__)</div><div class="line">		<span class="keyword">return</span> result</div><div class="line">	<span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@decorator</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">	print(<span class="string">'call func'</span>)</div><div class="line"></div><div class="line">	</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>func()</div><div class="line">before call func</div><div class="line">call func</div><div class="line">after call func</div></pre></td></tr></table></figure>
+<h3 id="函数装饰器"><a href="#函数装饰器" class="headerlink" title="函数装饰器"></a>函数装饰器</h3><p>函数装饰器，接受一个函数f作为输入，返回另外一个函数对象。 </p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="string">'''</span></div><div class="line">function decorator</div><div class="line">'''</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">time_cost_decorator</span><span class="params">(f)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">        start_time = time.time()</div><div class="line">        rv = f(*args, **kwargs)</div><div class="line">        end_time = time.time()</div><div class="line">        delta = end_time - start_time</div><div class="line">        print(<span class="string">'time cost: %ds'</span> %  delta)</div><div class="line">        <span class="keyword">return</span> rv</div><div class="line">    <span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">@time_cost_decorator</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sleep_10s_func</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">    time.sleep(<span class="number">10</span>)</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>sleep_10s_func()</div><div class="line">time cost: <span class="number">10</span>s</div></pre></td></tr></table></figure>
+<p>使用类实现函数装饰器，在对象初始化时接受一个函数f作为输入，在模拟调用<code>__call__</code>特殊方法中调用f函数</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="string">'''</span></div><div class="line">class decorator</div><div class="line">'''</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeCostDecorator</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, f)</span>:</span></div><div class="line">        self._f = f</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">        start_time = time.time()</div><div class="line">        ret = self._f(*args, **kwargs)</div><div class="line">        end_time = time.time()</div><div class="line">        delta = end_time - start_time</div><div class="line">        print(<span class="string">'time cost %ds'</span> % delta)</div><div class="line">        <span class="keyword">return</span> ret</div><div class="line"></div><div class="line"></div><div class="line"><span class="meta">@TimeCostDecorator</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sleep_5s_func</span><span class="params">()</span>:</span></div><div class="line">    time.sleep(<span class="number">5</span>)</div></pre></td></tr></table></figure>
+<h3 id="类装饰器"><a href="#类装饰器" class="headerlink" title="类装饰器"></a>类装饰器</h3><p>类装饰器的与函数装饰器语法非常类似。类装饰器接受cls作为输入，返回另外一个cls。</p>
+<p>类装饰器可以用来管理管理类，类实例的创建。</p>
+<p>函数实现类装饰器</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">class_decorator</span><span class="params">(cls)</span>:</span></div><div class="line">	<span class="class"><span class="keyword">class</span> <span class="title">ClassWrapper</span><span class="params">(object)</span>:</span></div><div class="line">		<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">			self._ins = cls(*args, **kwargs)</div><div class="line">		<span class="function"><span class="keyword">def</span> <span class="title">__getattr__</span><span class="params">(self, name)</span>:</span></div><div class="line">			print(<span class="string">'call ClassWapper.__getattr__ func'</span>)</div><div class="line">			<span class="keyword">return</span> getattr(self._ins, name)</div><div class="line">	<span class="keyword">return</span> ClassWrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@class_decorator</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span><span class="params">(object)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(self)</span>:</span></div><div class="line">		print(<span class="string">'call Foo.func'</span>)</div><div class="line"></div><div class="line">		</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>Foo().func()</div><div class="line">call ClassWapper.__getattr__ func</div><div class="line">call Foo.func</div></pre></td></tr></table></figure>
+<p>类实现类装饰器</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClassDecorator</span><span class="params">(object)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, cls)</span>:</span></div><div class="line">		self._cls = cls</div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, *args, **kwargs)</span>:</span></div><div class="line">		self._ins = self._cls(*args, **kwargs)</div><div class="line">		<span class="keyword">return</span> self</div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__getattr__</span><span class="params">(self, name)</span>:</span></div><div class="line">		print(<span class="string">'call ClassDecorator.__getattr__'</span>)</div><div class="line">		<span class="keyword">return</span> getattr(self._ins, name)</div><div class="line"></div><div class="line">	</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@ClassDecorator</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span><span class="params">(object)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">(self)</span>:</span></div><div class="line">		print(<span class="string">'call Foo.func func'</span>)</div><div class="line"></div><div class="line">		</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>Foo().func()</div><div class="line">call ClassDecorator.__getattr__</div><div class="line">call Foo.func func</div><div class="line">&gt;&gt;&gt;</div></pre></td></tr></table></figure>
+<h2 id="装饰器进阶"><a href="#装饰器进阶" class="headerlink" title="装饰器进阶"></a>装饰器进阶</h2><h3 id="带参数装饰器"><a href="#带参数装饰器" class="headerlink" title="带参数装饰器"></a>带参数装饰器</h3><p>不仅被装饰的函数可以携带参数，装饰器函数也可以携带参数。</p>
+<p>Decorator params imply three levels of callables: a callable to accept decorator arguments, which return a callable to serve a callable to serve as decorator, which return a callbale to handle calls to the origin function or class. Each of the three levels may be a function or class and may retain state in the form of scopes or class attributes.</p>
+<p>函数实现的带参数的函数装饰器：</p>
+<p>以最近写的权限验证为例，描述带参数的装饰器实现<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">perm_required</span><span class="params">(perm, **options)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line">		<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">			<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">		<span class="keyword">return</span> wrapper</div><div class="line">	<span class="keyword">return</span> decoraor</div></pre></td></tr></table></figure></p>
+<p>类实现的带参数的装饰器：</p>
+<p>TODO</p>
+<p>函数实现的带参数类装饰器：</p>
+<p>TODO</p>
+<p>类实现的带参数类装饰器：</p>
+<p>TODO</p>
+<h3 id="函数签名"><a href="#函数签名" class="headerlink" title="函数签名"></a>函数签名</h3><p><code>functools.wraps()</code> 保留被封装函数的签名，如<code>__module__</code>, <code>__name__</code>, <code>__doc__</code>等</p>
+<p>以下函数装饰器，被装饰的函数的签名被覆盖</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@decorator</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span> <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>func.__name__</div><div class="line"><span class="string">'wrapper'</span></div><div class="line">&gt;&gt;&gt;</div></pre></td></tr></table></figure>
+<p>调用<code>functools.wraps()</code>之后</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line"><span class="meta">	@functools.wraps(f)</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@decorator</div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span> <span class="keyword">pass</span></div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>func.__name__</div><div class="line"><span class="string">'func'</span></div></pre></td></tr></table></figure>
+<p><code>wraps()</code>函数的定义</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">WRAPPER_ASSIGNMENTS = (&apos;__module__&apos;, &apos;__name__&apos;, &apos;__doc__&apos;)</div><div class="line">WRAPPER_UPDATES = (&apos;__dict__&apos;)</div><div class="line">def wraps(wrapped, assign=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES):pass</div></pre></td></tr></table></figure>
+<h3 id="嵌套装饰器"><a href="#嵌套装饰器" class="headerlink" title="嵌套装饰器"></a>嵌套装饰器</h3><p>有时一个装饰器不能满足需求，这时，我们可以添加多个装饰器(decorator nesting)。</p>
+<p> 以下两个装饰器函数分别实现如下功能，<code>scroll_decorator()</code>添加滚动条，<code>border_decorator()</code>添加边框</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">border_decorator</span><span class="params">(f)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		print(<span class="string">'border wrapper'</span>)</div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">scroll_decorator</span><span class="params">(f)</span>:</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		print(<span class="string">'scroll decorator'</span>)</div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>@border_decorator</div><div class="line"><span class="meta">@scroll_decorator</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">decorated_func</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">	print(<span class="string">'call decorated func'</span>)</div><div class="line"></div><div class="line">	</div><div class="line"><span class="meta">&gt;&gt;&gt; </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>decorated_func()</div><div class="line">border wrapper</div><div class="line">scroll decorator</div><div class="line">call decorated func</div><div class="line">&gt;&gt;&gt;</div></pre></td></tr></table></figure>
+<p>以上装饰器从语法与以下等价<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorated_func</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">	print(<span class="string">'decorated func'</span>)</div><div class="line"></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>f = border_decorator(scroll_decorator(decorated_func))</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>f()</div><div class="line">border wrapper</div><div class="line">scroll decorator</div><div class="line">decorated func</div></pre></td></tr></table></figure></p>
+<h2 id="装饰器的其他特性"><a href="#装饰器的其他特性" class="headerlink" title="装饰器的其他特性"></a>装饰器的其他特性</h2><h3 id="装饰器与闭包"><a href="#装饰器与闭包" class="headerlink" title="装饰器与闭包"></a>装饰器与闭包</h3><p>TODO</p>
+<h3 id="装饰器与描述符"><a href="#装饰器与描述符" class="headerlink" title="装饰器与描述符"></a>装饰器与描述符</h3><p>TODO</p>
+<h2 id="装饰器使用场景"><a href="#装饰器使用场景" class="headerlink" title="装饰器使用场景"></a>装饰器使用场景</h2><h3 id="统计API的调用时间"><a href="#统计API的调用时间" class="headerlink" title="统计API的调用时间"></a>统计API的调用时间</h3><p>TODO</p>
+<h3 id="单例设计模式"><a href="#单例设计模式" class="headerlink" title="单例设计模式"></a>单例设计模式</h3><p>TODO</p>
+<h3 id="跟踪方法调用"><a href="#跟踪方法调用" class="headerlink" title="跟踪方法调用"></a>跟踪方法调用</h3><p>TODO</p>
+<h3 id="其他用例"><a href="#其他用例" class="headerlink" title="其他用例"></a>其他用例</h3><ul>
+<li>Flask 路由管理</li>
+<li>Django model 事务管理</li>
+<li>Tornado 异步框架</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://docs.python.org/2/library/functools.html#module-functools" target="_blank" rel="external">https://docs.python.org/2/library/functools.html#module-functools</a></li>
+<li><a href="http://stackoverflow.com/questions/5929107/python-decorators-with-parameters" target="_blank" rel="external">http://stackoverflow.com/questions/5929107/python-decorators-with-parameters</a></li>
+<li><em>Design Patterns - Elements of Resuable Object-Oriented Software</em></li>
+<li><em>Learning Python 5th Edition</em></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;装饰器是一种设计模型（结构型模式），可以动态给一个对象添加一些额外的职责，而不用修改该对象的任何code。&lt;/p&gt;
+&lt;p&gt;比如，我们要给一个API增加权限认证，可以通过&lt;code&gt;auth_decorator()&lt;/code&gt;装饰这个API，而不必修改每个API的代码；de
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+      <category term="decorator" scheme="http://blog.hotbaby.org/tags/decorator/"/>
+    
+      <category term="closure" scheme="http://blog.hotbaby.org/tags/closure/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>读书与不读书的区别</title>
+    <link href="http://blog.hotbaby.org/2017/03/21/%E8%AF%BB%E4%B9%A6%E4%B8%8E%E4%B8%8D%E8%AF%BB%E4%B9%A6%E7%9A%84%E5%8C%BA%E5%88%AB/"/>
+    <id>http://blog.hotbaby.org/2017/03/21/读书与不读书的区别/</id>
+    <published>2017-03-21T09:41:12.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>没有养成读书习惯的人，以时间和空间而言，是受他眼前的世界所禁锢的。</p>
+<p>他的生活是机械化的，刻板的。他只是跟几个朋友和相识者接触谈话，他只看到周遭发生的事情。他在这个监狱里是逃不出去的。</p>
+<p>可是当他拿起一本书的时候，他立刻走进一个不同的世界。如果是一本好书，他便立刻接触到世界上一个最健谈的人。</p>
+<p>这个谈话者引导他前进，带他到一个不同的国度或不同的时代，或者对他发泄一些私人的悔恨，或者跟他讨论一些他从来不知道的学问或生活问题。</p>
+<p>…</p>
+<p>摘自:《林语堂： 读书人和不读书的人，最大的区别是什么》</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;没有养成读书习惯的人，以时间和空间而言，是受他眼前的世界所禁锢的。&lt;/p&gt;
+&lt;p&gt;他的生活是机械化的，刻板的。他只是跟几个朋友和相识者接触谈话，他只看到周遭发生的事情。他在这个监狱里是逃不出去的。&lt;/p&gt;
+&lt;p&gt;可是当他拿起一本书的时候，他立刻走进一个不同的世界。如果是一本
+    
+    </summary>
+    
+    
+      <category term="读书" scheme="http://blog.hotbaby.org/tags/%E8%AF%BB%E4%B9%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python PEPs</title>
+    <link href="http://blog.hotbaby.org/2017/03/18/Python-PEP/"/>
+    <id>http://blog.hotbaby.org/2017/03/18/Python-PEP/</id>
+    <published>2017-03-18T00:16:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>什么是PEP?</p>
+<p>PEP是Python Enehencement Proposal的缩写．每篇PEP都是一个设计文档，或者描述Python社区信息，或者描述Python的新特性等．PEP提供了特性的技术规范和这个特性的来源.</p>
+<p>Python常见的PEP，比如PEP8 Python代码风格指南、PEP333 Python Web服务网关接口（WSGI）、PEP20  Python之禅、PEP248 Python 数据库接口规范等。</p>
+<ul>
+<li><a href="https://www.python.org/dev/peps/pep-0008/" target="_blank" rel="external">PEP8  Python代码风格指南</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0333/" target="_blank" rel="external">PEP333 Python Web服务网关接口 v1.0</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0020/" target="_blank" rel="external">PEP20 Python之禅</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0248/" target="_blank" rel="external">PEP248 Python数据库接口规范 v1.0</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0249/" target="_blank" rel="external">PEP249 Python数据库接口规范 v2.0</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0234/" target="_blank" rel="external">PEP234 迭代器</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-3129/" target="_blank" rel="external">PEP3129 类装饰器</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0318/" target="_blank" rel="external">PEP318 函数、方法装饰器</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0362/" target="_blank" rel="external">PEP362 函数签名对象</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0451/" target="_blank" rel="external">PEP451 A ModuleSpec Type for the Import System</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0328/" target="_blank" rel="external">PEP328 绝对相对import</a></li>
+<li><a href="https://www.python.org/dev/peps/pep-0343/" target="_blank" rel="external">PEP343 with语句</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.python.org/dev/peps/" target="_blank" rel="external">python-peps</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;什么是PEP?&lt;/p&gt;
+&lt;p&gt;PEP是Python Enehencement Proposal的缩写．每篇PEP都是一个设计文档，或者描述Python社区信息，或者描述Python的新特性等．PEP提供了特性的技术规范和这个特性的来源.&lt;/p&gt;
+&lt;p&gt;Python常见的PE
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+      <category term="PEP" scheme="http://blog.hotbaby.org/tags/PEP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>八达岭长城</title>
+    <link href="http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/"/>
+    <id>http://blog.hotbaby.org/2017/03/13/八达岭长城/</id>
+    <published>2017-03-13T00:31:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>骑行百里以前是躺在愿望单里了，现在已经成为一个现实，一段难忘的经历。</p>
+<p>两个快奔三的人还跟个愣头青一样骑着自行车去长城，是逃离城市放松一下，抑或是证明自己还年轻，抑或是其他，答案未知。只知道去时，充满激情，一路狂奔（山路阶段艰难骑行）；回来时，身体很疲惫，但心灵得到了某种不知名的慰藉。</p>
+<p>信息摘要：</p>
+<ul>
+<li>时间：2017.3.11</li>
+<li>人物：我与超</li>
+<li>出行方式：自行车</li>
+<li>行程：回龙观 - 八达岭长城 - 回龙观</li>
+</ul>
+<p>晒图：</p>
+<p><img src="https://bytebucket.org/hotbaby/resource/raw/c652673bc449badf42b4930169f532d1e807514e/%E5%85%AB%E8%BE%BE%E5%B2%AD/%E5%85%AB%E8%BE%BE%E5%B2%AD%EF%BC%8D%E8%B5%B7%E7%82%B91.jpg" alt=""></p>
+<p><img src="https://bytebucket.org/hotbaby/resource/raw/c652673bc449badf42b4930169f532d1e807514e/%E5%85%AB%E8%BE%BE%E5%B2%AD/%E5%85%AB%E8%BE%BE%E5%B2%AD%EF%BC%8D%E5%B1%85%E5%BA%B8%E5%85%B3.jpg" alt=""></p>
+<p><img src="https://bytebucket.org/hotbaby/resource/raw/c652673bc449badf42b4930169f532d1e807514e/%E5%85%AB%E8%BE%BE%E5%B2%AD/%E5%85%AB%E8%BE%BE%E5%B2%AD%EF%BC%8D%E7%BB%88%E7%82%B92.jpg" alt=""></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;骑行百里以前是躺在愿望单里了，现在已经成为一个现实，一段难忘的经历。&lt;/p&gt;
+&lt;p&gt;两个快奔三的人还跟个愣头青一样骑着自行车去长城，是逃离城市放松一下，抑或是证明自己还年轻，抑或是其他，答案未知。只知道去时，充满激情，一路狂奔（山路阶段艰难骑行）；回来时，身体很疲惫，但心灵
+    
+    </summary>
+    
+      <category term="旅行" scheme="http://blog.hotbaby.org/categories/%E6%97%85%E8%A1%8C/"/>
+    
+    
+      <category term="八达岭长城" scheme="http://blog.hotbaby.org/tags/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>我在平遥等你</title>
+    <link href="http://blog.hotbaby.org/2017/03/09/%E6%88%91%E5%9C%A8%E5%B9%B3%E9%81%A5%E7%AD%89%E4%BD%A0/"/>
+    <id>http://blog.hotbaby.org/2017/03/09/我在平遥等你/</id>
+    <published>2017-03-09T23:05:00.000Z</published>
+    <updated>2017-05-06T03:38:16.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="https://bytebucket.org/hotbaby/resource/raw/7d8f72b68eda348ba55bae0ec6b08c774177aeef/%E5%B9%B3%E9%81%A5/%E5%B9%B3%E9%81%A51.jpg" alt=""></p>
+<p><img src="https://bytebucket.org/hotbaby/resource/raw/7d8f72b68eda348ba55bae0ec6b08c774177aeef/%E5%B9%B3%E9%81%A5/%E5%B9%B3%E9%81%A52.jpg" alt=""></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;https://bytebucket.org/hotbaby/resource/raw/7d8f72b68eda348ba55bae0ec6b08c774177aeef/%E5%B9%B3%E9%81%A5/%E5%B9%B3%E9%81%A51.jpg
+    
+    </summary>
+    
+      <category term="旅行" scheme="http://blog.hotbaby.org/categories/%E6%97%85%E8%A1%8C/"/>
+    
+    
+  </entry>
+  
+</feed>
