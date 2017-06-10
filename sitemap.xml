@@ -2,6 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/06/09/Python-debug/</loc>
+    
+    <lastmod>2017-06-09T10:41:49.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hotbaby.org/2017/06/09/debian-timezone/</loc>
+    
+    <lastmod>2017-06-09T09:21:08.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hotbaby.org/2017/06/09/Python-customization/</loc>
+    
+    <lastmod>2017-06-09T06:46:11.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/</loc>
     
     <lastmod>2017-06-08T06:46:17.000Z</lastmod>
@@ -128,14 +149,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
-    
-    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -149,7 +163,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</loc>
+    
+    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -163,7 +184,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
+    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -184,7 +205,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
