@@ -728,9 +728,9 @@
       <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
     
     
-      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
-    
       <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
     
       <category term="cache" scheme="http://blog.hotbaby.org/tags/cache/"/>
     
@@ -809,9 +809,9 @@
       <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
     
     
-      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
-    
       <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
     
   </entry>
   
