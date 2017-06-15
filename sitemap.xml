@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/04/20/django-signals/</loc>
+    
+    <lastmod>2017-06-14T02:35:26.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/2017/06/09/Python-customization/</loc>
     
     <lastmod>2017-06-12T00:57:06.000Z</lastmod>
@@ -149,7 +156,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -163,7 +170,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</loc>
+    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -184,7 +191,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     

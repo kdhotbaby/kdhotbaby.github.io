@@ -590,6 +590,59 @@
   </entry>
   
   <entry>
+    <title>Django signal</title>
+    <link href="http://blog.hotbaby.org/2017/04/20/django-signals/"/>
+    <id>http://blog.hotbaby.org/2017/04/20/django-signals/</id>
+    <published>2017-04-20T15:45:00.000Z</published>
+    <updated>2017-06-14T02:35:26.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>信号实现了一个复杂系统中子系统之间的解耦，一个子系统的状态发生改变时，通过信号同步（或通知）其他依赖于该系统的系统更新状态，实现了状态的一致性。</p>
+<p>不同于flask，直接使用blinker，django内部实现了信号处理机制。</p>
+<p><strong>实现原理</strong></p>
+<p>定义信号</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, providing_args=None, use_caching=False)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Create a new signal.</div><div class="line"></div><div class="line">    providing_args</div><div class="line">        A list of the arguments this signal can pass along in a send() call.</div><div class="line">    """</div><div class="line">    self.receivers = []</div><div class="line">    <span class="keyword">if</span> providing_args <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">        providing_args = []</div><div class="line">    self.providing_args = set(providing_args)</div><div class="line">    self.lock = threading.Lock()</div><div class="line">    self.use_caching = use_caching</div><div class="line">    <span class="comment"># For convenience we create empty caches even if they are not used.</span></div><div class="line">    <span class="comment"># A note about caching: if use_caching is defined, then for each</span></div><div class="line">    <span class="comment"># distinct sender we cache the receivers that sender has in</span></div><div class="line">    <span class="comment"># 'sender_receivers_cache'. The cache is cleaned when .connect() or</span></div><div class="line">    <span class="comment"># .disconnect() is called and populated on send().</span></div><div class="line">    self.sender_receivers_cache = weakref.WeakKeyDictionary() <span class="keyword">if</span> use_caching <span class="keyword">else</span> &#123;&#125;</div><div class="line">    self._dead_receivers = <span class="keyword">False</span></div></pre></td></tr></table></figure>
+<p>连接信号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):</div><div class="line">   from django.conf import settings</div><div class="line"></div><div class="line">    # If DEBUG is on, check that we got a good receiver</div><div class="line">    if settings.configured and settings.DEBUG:</div><div class="line">        assert callable(receiver), &quot;Signal receivers must be callable.&quot;</div><div class="line"></div><div class="line">        # Check for **kwargs</div><div class="line">        if not func_accepts_kwargs(receiver):</div><div class="line">            raise ValueError(&quot;Signal receivers must accept keyword arguments (**kwargs).&quot;)</div><div class="line"></div><div class="line">    if dispatch_uid:</div><div class="line">        lookup_key = (dispatch_uid, _make_id(sender))</div><div class="line">    else:</div><div class="line">        lookup_key = (_make_id(receiver), _make_id(sender))</div><div class="line"></div><div class="line">    if weak:</div><div class="line">        ref = weakref.ref</div><div class="line">        receiver_object = receiver</div><div class="line">        # Check for bound methods</div><div class="line">        if hasattr(receiver, &apos;__self__&apos;) and hasattr(receiver, &apos;__func__&apos;):</div><div class="line">            ref = WeakMethod</div><div class="line">            receiver_object = receiver.__self__</div><div class="line">        if sys.version_info &gt;= (3, 4):</div><div class="line">            receiver = ref(receiver)</div><div class="line">            weakref.finalize(receiver_object, self._remove_receiver)</div><div class="line">        else:</div><div class="line">            receiver = ref(receiver, self._remove_receiver)</div><div class="line"></div><div class="line">    with self.lock:</div><div class="line">        self._clear_dead_receivers()</div><div class="line">        for r_key, _ in self.receivers:</div><div class="line">            if r_key == lookup_key:</div><div class="line">                break</div><div class="line">        else:</div><div class="line">            self.receivers.append((lookup_key, receiver))</div><div class="line">        self.sender_receivers_cache.clear()</div></pre></td></tr></table></figure>
+<p>发送信号</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">send</span><span class="params">(self, sender, **named)</span>:</span></div><div class="line">    responses = []</div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self.receivers <span class="keyword">or</span> self.sender_receivers_cache.get(sender) <span class="keyword">is</span> NO_RECEIVERS:</div><div class="line">        <span class="keyword">return</span> responses</div><div class="line"></div><div class="line">    <span class="keyword">for</span> receiver <span class="keyword">in</span> self._live_receivers(sender):</div><div class="line">        response = receiver(signal=self, sender=sender, **named)</div><div class="line">        responses.append((receiver, response))</div><div class="line">    <span class="keyword">return</span> responses</div></pre></td></tr></table></figure>
+<p>断开连接</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">disconnect</span><span class="params">(self, receiver=None, sender=None, weak=True, dispatch_uid=None)</span>:</span></div><div class="line">    <span class="keyword">if</span> dispatch_uid:</div><div class="line">        lookup_key = (dispatch_uid, _make_id(sender))</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        lookup_key = (_make_id(receiver), _make_id(sender))</div><div class="line"></div><div class="line">    disconnected = <span class="keyword">False</span></div><div class="line">    <span class="keyword">with</span> self.lock:</div><div class="line">        self._clear_dead_receivers()</div><div class="line">        <span class="keyword">for</span> index <span class="keyword">in</span> range(len(self.receivers)):</div><div class="line">            (r_key, _) = self.receivers[index]</div><div class="line">            <span class="keyword">if</span> r_key == lookup_key:</div><div class="line">                disconnected = <span class="keyword">True</span></div><div class="line">                <span class="keyword">del</span> self.receivers[index]</div><div class="line">                <span class="keyword">break</span></div><div class="line">        self.sender_receivers_cache.clear()</div><div class="line">    <span class="keyword">return</span> disconnected</div></pre></td></tr></table></figure>
+<p>信号发生时序图</p>
+<p>TODO</p>
+<p>weakref</p>
+<p>为了防止调用被释放了对象，信号内部保持对receiver调用对象的弱引用，每次发送信号之前，检查该对象是否存在，如果不存在，则标记<code>_dead_receivers</code>为True,等待清楚。</p>
+<p>thread lock</p>
+<p>使用线程锁保证线程安全</p>
+<p><strong>观察者设计模式</strong></p>
+<p>定义对象间一对多的依赖关系，当一个对象的状体发生改变时，所有依赖于它的对象都得到通知并被自动更新。</p>
+<p>将一系统分割成一系列相互协作的类有一个副作用：需要维护对象间的一致性。我们不希望为了维持一致性而使各类聚合，这样就降低了可重用性。</p>
+<p>observer模式描述了如何建立这种关系。这一模式的关键对象是目标（subject）和观察者（observer）.一个目标可以有任意数量的观察者。一旦目标的状态发生改变，所有的观察者都得到通知。作为对这个通知的响应，每个观察者都将查询目标以使其状态与目标的状态同步。</p>
+<p>这种交互也成为发布-订阅（publish-subscribe）.目标是通知的发布者，可以有任意数目的观察者订阅并接收通知。</p>
+<p><code>/django/dispatch/dispatcher.py</code></p>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://docs.python.org/2/library/weakref.html" target="_blank" rel="external">python2.7 weakref</a></li>
+<li><a href="https://docs.python.org/3.4/library/weakref.html" target="_blank" rel="external">python3.4 weakref</a></li>
+<li><em>Design Patterns - Elements of Reusable Object-Oriented Software Observer</em></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;信号实现了一个复杂系统中子系统之间的解耦，一个子系统的状态发生改变时，通过信号同步（或通知）其他依赖于该系统的系统更新状态，实现了状态的一致性。&lt;/p&gt;
+&lt;p&gt;不同于flask，直接使用blinker，django内部实现了信号处理机制。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;实现
+    
+    </summary>
+    
+      <category term="django" scheme="http://blog.hotbaby.org/categories/django/"/>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Git</title>
     <link href="http://blog.hotbaby.org/2017/04/19/git/"/>
     <id>http://blog.hotbaby.org/2017/04/19/git/</id>
@@ -866,48 +919,6 @@
     
     
       <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python help functions</title>
-    <link href="http://blog.hotbaby.org/2017/03/29/Python-help-functions/"/>
-    <id>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</id>
-    <published>2017-03-29T15:13:00.000Z</published>
-    <updated>2017-05-06T03:38:16.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>介绍Python 标准库中常用函数。比如<code>map</code>,<code>functools.partial()</code> <code>functools.wraps()</code>, <code>itertools.chain()</code>等，减少重复造轮子，提高编码效率。</p>
-<h2 id="Python-Standard-Library"><a href="#Python-Standard-Library" class="headerlink" title="Python Standard Library"></a>Python Standard Library</h2><h3 id="built-in"><a href="#built-in" class="headerlink" title="built-in"></a>built-in</h3><h4 id="map"><a href="#map" class="headerlink" title="map()"></a>map()</h4><p><code>map(func, iterable)</code> 将函数应用于迭代对象中的每一个元素，返回应用之后结果列表。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>l = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>map(<span class="keyword">lambda</span> x: str(x), l)</div><div class="line">[<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>]</div></pre></td></tr></table></figure>
-<h4 id="filter"><a href="#filter" class="headerlink" title="filter()"></a>filter()</h4><p><code>filter(func, iterable)</code> 将函数应用于可迭代对象中的每一个元素，<code>if func()</code>为真，则将该元素添加的返回的结果列表中。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>l = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>filter(<span class="keyword">lambda</span> x: x%<span class="number">2</span>==<span class="number">0</span>, l)</div><div class="line">[<span class="number">2</span>, <span class="number">4</span>]</div></pre></td></tr></table></figure>
-<h3 id="functoos"><a href="#functoos" class="headerlink" title="functoos"></a>functoos</h3><p>可调用对象（callable object）的高阶函数、操作。通常来讲，任何可调用对象都可以看作一个函数。</p>
-<h4 id="functools-wraps"><a href="#functools-wraps" class="headerlink" title="functools.wraps()"></a><code>functools.wraps()</code></h4><p><code>wraps(wrapped[,assigned][,updated])</code><br>常用装饰器函数中返回的<code>wrapper()</code>函数，解决了被装饰函数__name__、__doc__等签名丢失问题。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> functools</div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(f)</span>:</span></div><div class="line"><span class="meta">	@functools.wrap(f)</span></div><div class="line">	<span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">		<span class="keyword">return</span> f(*args, **kwargs)</div><div class="line">	<span class="keyword">return</span> wrapper</div></pre></td></tr></table></figure>
-<h4 id="functools-partial"><a href="#functools-partial" class="headerlink" title="functools.partial()"></a><code>functools.partial()</code></h4><p><code>partial(func[,*args][,**kwargs])</code><br>是一个装饰器函数，也是一个闭包，返回一个可调用对象，freeze一些参数。</p>
-<p>实现原理</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">partial</span><span class="params">(func, *args, **keywords)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">newfunc</span><span class="params">(*fargs, **fkeywords)</span>:</span></div><div class="line">        newkeywords = keywords.copy()</div><div class="line">        newkeywords.update(fkeywords)</div><div class="line">        <span class="keyword">return</span> func(*(args + fargs), **newkeywords)</div><div class="line">    newfunc.func = func</div><div class="line">    newfunc.args = args</div><div class="line">    newfunc.keywords = keywords</div><div class="line">    <span class="keyword">return</span> newfunc</div></pre></td></tr></table></figure>
-<h3 id="itertools"><a href="#itertools" class="headerlink" title="itertools"></a>itertools</h3><h4 id="itertools-imap"><a href="#itertools-imap" class="headerlink" title="itertools.imap()"></a>itertools.imap()</h4><p><code>imap(func, *iterables)</code> 和iter和map混合体。</p>
-<p>工作原理</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">myimap</span><span class="params">(func, *iterables)</span>:</span></div><div class="line">	iterables = map(iter,iterables)</div><div class="line">	<span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">		args = [next(it) <span class="keyword">for</span> it <span class="keyword">in</span> iterables]</div><div class="line">		<span class="keyword">yield</span> func(*args)</div><div class="line"></div><div class="line">		</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>[item <span class="keyword">for</span> item <span class="keyword">in</span> myimap(pow, (<span class="number">2</span>,<span class="number">2</span>), (<span class="number">3</span>,<span class="number">3</span>))]</div><div class="line">[<span class="number">8</span>, <span class="number">8</span>]</div></pre></td></tr></table></figure>
-<h4 id="itertools-chain"><a href="#itertools-chain" class="headerlink" title="itertools.chain()"></a>itertools.chain()</h4><p><code>chain(*iterables)</code> 返回一个迭代器，该迭代器依次返回可迭代对象中没一个元素。</p>
-<p>工作原理</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">mychain</span><span class="params">(*iterables)</span>:</span></div><div class="line">	<span class="keyword">for</span> iter_ <span class="keyword">in</span> iterables:</div><div class="line">		<span class="keyword">for</span> item <span class="keyword">in</span> iter_:</div><div class="line">			<span class="keyword">yield</span> item</div><div class="line">			</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>[item <span class="keyword">for</span> item <span class="keyword">in</span> mychain(<span class="string">'abc'</span>, <span class="string">'def'</span>)]</div><div class="line">[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>, <span class="string">'e'</span>, <span class="string">'f'</span>]</div></pre></td></tr></table></figure>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
-<li><a href="https://docs.python.org/2/library/functions.html" target="_blank" rel="external">https://docs.python.org/2/library/functions.html</a></li>
-<li><a href="https://docs.python.org/2/library/functools.html" target="_blank" rel="external">https://docs.python.org/2/library/functools.html</a></li>
-<li><a href="https://docs.python.org/2/library/itertools.html" target="_blank" rel="external">https://docs.python.org/2/library/itertools.html</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;介绍Python 标准库中常用函数。比如&lt;code&gt;map&lt;/code&gt;,&lt;code&gt;functools.partial()&lt;/code&gt; &lt;code&gt;functools.wraps()&lt;/code&gt;, &lt;code&gt;itertools.chain()&lt;/code&gt;等，减少重
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
     
   </entry>
   
