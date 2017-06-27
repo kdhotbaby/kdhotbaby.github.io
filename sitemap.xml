@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/04/19/git/</loc>
+    
+    <lastmod>2017-06-26T01:32:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/2017/03/18/Python-PEP/</loc>
     
     <lastmod>2017-06-21T02:15:19.000Z</lastmod>
@@ -121,13 +128,6 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/19/git/</loc>
-    
-    <lastmod>2017-05-16T07:54:00.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.hotbaby.org/2017/03/02/hexo/</loc>
     
     <lastmod>2017-05-15T02:32:22.000Z</lastmod>
@@ -163,7 +163,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -191,7 +191,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -212,7 +212,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
+    <loc>http://blog.hotbaby.org/2017/04/01/RSS-feed/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     

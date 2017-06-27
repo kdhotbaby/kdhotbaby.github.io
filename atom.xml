@@ -647,7 +647,7 @@
     <link href="http://blog.hotbaby.org/2017/04/19/git/"/>
     <id>http://blog.hotbaby.org/2017/04/19/git/</id>
     <published>2017-04-19T10:31:00.000Z</published>
-    <updated>2017-05-16T07:54:00.000Z</updated>
+    <updated>2017-06-26T01:32:43.000Z</updated>
     
     <content type="html"><![CDATA[<p>Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed and efficiency.</p>
 <h2 id="custom-domain-redirect"><a href="#custom-domain-redirect" class="headerlink" title="custom domain redirect"></a>custom domain redirect</h2><p>添加DNS解析记录：</p>
@@ -682,6 +682,10 @@
 <p>切换到tag</p>
 <p><code>git check tag_name</code></p>
 <p>删除tag<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git tag <span class="_">-d</span> tag_name <span class="comment">#删除本地tag</span></div><div class="line">$ git push  origin --delete tag &lt;tag_name&gt; <span class="comment">#删除服务器tag</span></div></pre></td></tr></table></figure></p>
+<h2 id="config"><a href="#config" class="headerlink" title="config"></a>config</h2><p>编辑配置文件：</p>
+<p><code>vim ~/.gitconfig</code></p>
+<p>配置编辑器：</p>
+<p><code>git config --global core.editor vim</code></p>
 <h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ul>
 <li><a href="https://git-scm.com/book/zh/v1/Git-%E5%B7%A5%E5%85%B7-%E5%AD%90%E6%A8%A1%E5%9D%97" target="_blank" rel="external">Git子模块</a></li>
 <li><a href="http://wonux.tech/git-git-submodule.html" target="_blank" rel="external">Git子模块引用外部项目</a></li>
@@ -693,6 +697,8 @@
       &lt;p&gt;Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed
     
     </summary>
+    
+      <category term="git" scheme="http://blog.hotbaby.org/categories/git/"/>
     
     
       <category term="git" scheme="http://blog.hotbaby.org/tags/git/"/>
