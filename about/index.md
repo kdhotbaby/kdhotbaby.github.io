@@ -10,6 +10,6 @@ comments: false
 
 <i class="fa fa-github"></i> GitHub: [@hotbaby](https://github.com/hotbaby)
 
-<i class="fa fa-bitbucket"></i> Bitbucket: [@hotbaby](https://bitbucket.org/hotbaby)
+<i class="fa fa-gitlab"></i> GitLab: [@hotbaby](https://gitlab.com/hotbaby)
 
 <i class="fa fa-rss"></i> Cnblogs: [@hotbaby](http://www.cnblogs.com/hotbaby)
