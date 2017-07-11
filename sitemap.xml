@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/07/10/Python-descriptor/</loc>
+    
+    <lastmod>2017-07-10T16:00:32.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/2017/07/09/Python-context/</loc>
     
     <lastmod>2017-07-10T01:33:30.000Z</lastmod>
@@ -177,14 +184,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/09/%E6%88%91%E5%9C%A8%E5%B9%B3%E9%81%A5%E7%AD%89%E4%BD%A0/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/05/%E8%AF%BB%E3%80%8A%E8%85%BE%E8%AE%AF%E4%BC%A0%E3%80%8B/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -198,20 +205,6 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/28/%E9%BB%91%E5%AE%A2%E4%BC%A6%E7%90%86/</loc>
-    
-    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
-    
-    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.hotbaby.org/2017/03/29/Python-help-functions/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
@@ -219,7 +212,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/history/index.html</loc>
+    <loc>http://blog.hotbaby.org/2017/04/28/%E9%BB%91%E5%AE%A2%E4%BC%A6%E7%90%86/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -233,6 +226,20 @@
   </url>
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/03/09/%E6%88%91%E5%9C%A8%E5%B9%B3%E9%81%A5%E7%AD%89%E4%BD%A0/</loc>
+    
+    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.hotbaby.org/2017/03/28/Python-%E8%A3%85%E9%A5%B0%E5%99%A8/</loc>
+    
+    <lastmod>2017-05-06T03:38:16.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/guestbook/index.html</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
@@ -240,7 +247,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
+    <loc>http://blog.hotbaby.org/history/index.html</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
