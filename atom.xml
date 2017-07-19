@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-07-16T08:44:34.000Z</updated>
+  <updated>2017-07-18T14:57:26.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -16,87 +16,71 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Python metaclass</title>
-    <link href="http://blog.hotbaby.org/2017/07/16/Python-metaclass/"/>
-    <id>http://blog.hotbaby.org/2017/07/16/Python-metaclass/</id>
-    <published>2017-07-16T08:44:34.000Z</published>
-    <updated>2017-07-16T08:44:34.000Z</updated>
+    <title>Python Metaclass</title>
+    <link href="http://blog.hotbaby.org/2017/07/18/untitled-1500307428319/"/>
+    <id>http://blog.hotbaby.org/2017/07/18/untitled-1500307428319/</id>
+    <published>2017-07-18T14:57:26.000Z</published>
+    <updated>2017-07-18T14:57:26.000Z</updated>
     
-    <content type="html"><![CDATA[<p><strong>[Metaclasses] are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the people who actually need them know with certainty that they need them, and don’t need an explanation about why).</strong></p>
-<p>In other words, metaclasses are ultimately just another way to define automatically run code. With the tools listed in the prior section, Python provides ways for us to interject logic in a variety of contexts—at operator evaluation, attribute access, function calls, class instance creation, and now class object creation. It’s a language with hooks galore —a feature open to abuse like any other, but one that also offers the flexibility that some programmers desire, and that some programs may require.</p>
-<p>instances are created from classes, and classes are created from type</p>
-<p>• Types are defined by classes that derive from type.<br>• User-defined classes are instances of type classes.<br>• User-defined classes are types that generate instances of their own.</p>
-<h2 id="Metaclasses-Are-Subclasses-of-Type"><a href="#Metaclasses-Are-Subclasses-of-Type" class="headerlink" title="Metaclasses Are Subclasses of Type"></a>Metaclasses Are Subclasses of Type</h2><p>• type is a class that generates user-defined classes.<br>• Metaclasses are subclasses of the type class.<br>• Class objects are instances of the type class, or a subclass thereof.<br>• Instance objects are generated from a class.</p>
-<h2 id="Class-Statement-Protocol"><a href="#Class-Statement-Protocol" class="headerlink" title="Class Statement Protocol"></a>Class Statement Protocol</h2><p>We’ve already learned that when Python reaches a class statement, it runs its nested block of code to create its attributes—all the names assigned at the top level of the nested code block generate attributes in the resulting class object. These names are usually method functions created by nested defs, but they can also be arbitrary attributes assigned to create class data shared by all instances.<br>Technically speaking, Python follows a standard protocol to make this happen: at the end of a class statement, and after running all its nested code in a namespace dictionary corresponding to the class’s local scope, Python calls the type object to create the class object like this:<br><code>class = type(classname, superclasses, attributedict)</code></p>
-<p>The type object in turn defines a <strong>call</strong> operator overloading method that runs two other methods when the type object is called:</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">type.__new__(typeclass, classname, superclasses, attributedict)</div><div class="line">type.__init__(class, classname, superclasses, attributedict)</div></pre></td></tr></table></figure>
-<h2 id="Inheritance-and-Instance"><a href="#Inheritance-and-Instance" class="headerlink" title="Inheritance and Instance"></a>Inheritance and Instance</h2><ul>
-<li>Metaclass inherit from the type class(usually)</li>
-<li>Metaclass declarations are inherited by subclasses</li>
-<li>Metaclass attributes are not inherited by class instances</li>
-<li>Metaclass attributes are acquired by classes</li>
+    <content type="html"><![CDATA[<p><em>[Metaclasses] are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the people who actually need them know with certainty that they need them, and don’t need an explanation about why).</em> The Python core developer Time Peters said.</p>
+<p>元类是创建类的类。新风格(new-style)类是type类的实例。元类是type类的派生类，通过重载type类的<code>__new__</code>和<code>__init__</code>方法，重新定义类创建协议，来实现类创建的定制化。</p>
+<h2 id="元类模型"><a href="#元类模型" class="headerlink" title="元类模型"></a>元类模型</h2><p>(对象)实例是通过类创建，类是通过type类创建，元类是type类的派生类。</p>
+<ul>
+<li>类型(自定义)是通过type类或type派生元类创建</li>
+<li>元类是type类的派生类</li>
+<li>用户自定义类是type类的实例</li>
+<li>用户自定义类可以生成自己的实例</li>
 </ul>
-<p><em>Metaclass inherit from the type class(usually)</em></p>
-<p>Metaclass typically redefined the type class’s <code>__new__</code> and <code>__init__</code> to customize class creation and initialization.</p>
-<p><em>Metaclass declarations are inherited by subclass</em></p>
-<p>The <code>metaclass=M</code> declaration in a user-defined class is inherited by the class’s normal subclass, so the metaclass will run for the construction of each class that inherits this specification in a superclass inheritance chain.</p>
-<p><em>Metaclass attributes are not inherited by class instances</em></p>
-<p>classes are instances of metaclass, the behavior defined in a metaclass applies to the class, but not the class’s later instance.</p>
-<p><em>Metaclass attributes are acquired by classes</em></p>
-<h2 id="Inheritance-The-Full-Story"><a href="#Inheritance-The-Full-Story" class="headerlink" title="Inheritance: The Full Story"></a>Inheritance: The Full Story</h2><p>instance inheritances works in similar ways, whether the “instance” is created from a normal class, or is class created from a metalcass subclass of type.</p>
-<p><strong>Python’s inheritance algorithm: The simple version</strong></p>
-<p>Technically, inheritane deploys two distinct but similar lookup routines, and is based on MROs. Because <code>__bases__</code> are used to construct the <code>__mro__</code> ordering at class creation time, and because class’s <code>__mro__</code> inlcudes itself, the prior section’s generalization is the same as the following</p>
+<h3 id="类声明协议"><a href="#类声明协议" class="headerlink" title="类声明协议"></a>类声明协议</h3><p>Python解释器在类声明语句结束时，调用type类型创建，<code>class = type(classname, superclasses, attributedict)</code>。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">type.__new__(meta, classname, superclasses, attributedict)</div><div class="line">type.__init__(cls, classname, superclasses, attributedict)</div></pre></td></tr></table></figure>
+<h2 id="声明元类"><a href="#声明元类" class="headerlink" title="声明元类"></a>声明元类</h2><p>Py3与Py2声明元类的方式不一样：</p>
+<p>Py3声明元类</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Metaclass</span><span class="params">(type)</span>:</span></div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(meta, classname, superclasses, attributedict)</span>:</span></div><div class="line"><span class="meta">... </span>        <span class="keyword">return</span> type(classname, superclasses, attributedict)</div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(cls, classname, superclasses, attributedict)</span>:</span></div><div class="line"><span class="meta">... </span>        <span class="keyword">pass</span></div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Dummy</span><span class="params">(object, metaclass=Metaclass)</span>:</span></div><div class="line"><span class="meta">... </span>    <span class="keyword">pass</span></div><div class="line">...</div></pre></td></tr></table></figure>
+<p>Py2声明元类</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Metaclass</span><span class="params">(type)</span>:</span></div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(meta, classname, superclasses, attributedict)</span>:</span></div><div class="line"><span class="meta">... </span>        <span class="keyword">return</span> type(classname, superclasses, attributedict)</div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(cls, classname, superclasses, attributedict)</span>:</span></div><div class="line"><span class="meta">... </span>        <span class="keyword">pass</span></div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Dummy</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">... </span>    __metaclass__ = Metaclass</div><div class="line">...</div></pre></td></tr></table></figure>
+<h2 id="继承和实例"><a href="#继承和实例" class="headerlink" title="继承和实例"></a>继承和实例</h2><ul>
+<li>元类继承于type类</li>
+<li>元类的声明可以被派生类继承</li>
+<li>元类的属性不能被类的实例继承</li>
+<li>元类的属性可以被类获取</li>
+</ul>
+<p><strong>元类继承于type类</strong></p>
+<p>元类重载type类的<code>__new__</code>和<code>__init__</code>方法，定制类的创建和初始化。</p>
+<p><strong>元类的声明可以被派生类继承</strong></p>
+<p><strong>元类的属性不能被类实例继承</strong></p>
+<p>类是元类的实例，元类的行为可以被类访问，当类不能被类的实例访问。</p>
+<p><strong>元类的属性可以被类获取</strong></p>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p><strong>Python继承算法</strong></p>
 <ol>
-<li><p>From an instance I, search the instance, the its class, and then all its superclasses<br>a. The <code>__dict__</code> of. the instance I.<br>b. The <code>__dict__</code> of all classes on the <code>__mro__</code> found at I’s <code>__class__</code>, from left to right</p>
-</li>
-<li><p>From a class C, search the class, then all its superclasses, and then its metaclass tree using:<br>a. The <code>__dict__</code> of all the classes on the <code>__mro__</code> found at C itslef, from left to right<br>b. The <code>__dict__</code> of all metaclasses on the <code>__mro__</code> found at C’s <code>__class__</code>, from left to right</p>
-</li>
-<li><p>In both rule 1 and 2, give precedence to data descriptor located in step b sources</p>
-</li>
-<li><p>In both rule 1 and 2, skip a and begin the search at step b for built-in operations</p>
-</li>
+<li>对于一个实例，先搜索这个实例，再搜索实例的类，再搜索超类<br> a. 先搜索实例的<code>__dict__</code><br> b. 再搜索该实例的类的<code>__mro__</code>对应类的<code>__dict__</code></li>
+<li>对于一个类，先搜索类，再搜索超类，再搜索元类<br> a. 根据<code>__mro__</code>搜索类的<code>__dict__</code><br> b. 再搜索元类的<code>__dict__</code></li>
+<li>规则1和2中，再b阶段中，数据描述的优先级高</li>
+<li>规则1和2中，对于内置的运算符，跳过a阶段</li>
 </ol>
-<p><strong>The descriptors special case</strong></p>
-<p>In short, some descriptors known as data descriptors –those that defined <code>__set__</code> methods to intercept assignments– are given precedence, such that their names override other their inheritance sources.</p>
+<p><strong>数据描述符继承算法</strong></p>
+<p>对于定义了<code>__set__</code>拦截赋值的描述符就是数据描述符。</p>
 <figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">D</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__get__</span><span class="params">(self, ins, _type)</span>:</span></div><div class="line"><span class="meta">... </span>            print(<span class="string">'call D.__get__'</span>)</div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__set__</span><span class="params">(self, ins, value)</span>:</span></div><div class="line"><span class="meta">... </span>            print(<span class="string">'call D.__set__'</span>)</div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Dummy</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">... </span>    d = D()</div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins = Dummy()</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins.d</div><div class="line">call D.__get__</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins.d = <span class="string">'spam'</span></div><div class="line">call D.__set__</div></pre></td></tr></table></figure>
-<p>If this descriptor did not define a <code>__set__</code>, the name in the instance’s dictionary would hide the name in its class instead, per normal inheritance:</p>
+<p>未定义<code>__set__</code>的描述符</p>
 <figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">D</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__get__</span><span class="params">(self, ins, value)</span>:</span></div><div class="line"><span class="meta">... </span>            print(<span class="string">'call D.__get__'</span>)</div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Dummy</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">... </span>    d = D()</div><div class="line"><span class="meta">... </span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins = Dummy()</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins.d</div><div class="line">call D.__get__</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins.d = <span class="string">'spam'</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>ins.d</div><div class="line"><span class="string">'spam</span></div></pre></td></tr></table></figure>
-<p><strong>Python’s inheritance algorithm: The somewhat-more-complete version</strong></p>
-<p>Python’s full new-style inheritance algorithm can be stated as follows - a complex procedure, which assumes knowledge of descriptors, metaclass, and MROs, but is the final arbiter of attribute names nonetheless.</p>
-<p><em>To look up an explicit attribute name:</em></p>
+<p>Python 的继承算法</p>
 <ol>
-<li><p>From an instance I, search the instance, its class, and its superclasses, as follows:</p>
-<p> a.  Search the <code>__dict__</code> of all classes on the <code>__mro__</code> at I’s <code>__class__</code><br> b.  If a data descriptor was foudn in step a, call it and exit<br> c. Else, return a value in the <code>__dict__</code> of instance I<br> c. Else, call a non data descriptor or return a value found in step a</p>
-</li>
-<li><p>From a class C, search the class, its superclasses, and its metaclasses tree, as follows:<br>a. Search the <code>__dict__</code> of all metaclass on the <code>__mro__</code> found at C’s <code>__class__</code><br>b. If a data descriptor was found in step <em>a</em>, call it and exit<br>   c. Else, call a descriptor or return a value in the <code>__dict__</code> of a class on C’s own <code>__mro__</code><br>d. Else, call a non-data descriptor or return a value found in step a</p>
-</li>
-<li><p>In both rule 1 and 2, built-in operations use just step a sources</p>
-</li>
+<li>对于实例I，先搜索实例，再搜索类，再搜索超类<br> a. 根据类的<code>__mro__</code>搜索超类的<code>__dict__</code><br> b. If 如果在a阶段发现了数据描述，调用该数据描述，完成后退出<br> c. Else 返回该实例<code>__dict__</code>中的值<br> d. Else 调用非数据描述符，并放回结果</li>
+<li>对于类C，搜索类，再搜索超类，再搜索元类<br> a. 搜索类的<code>__mro__</code>依次搜索类的<code>__dict__</code><br> b. If 如果在a阶段发现了数据描述符，调用该数据描述符，完成后退出<br> c. Else 返回该类<code>__dict__</code>中值<br> d. Else 调用非数据描述符，返回结果</li>
 </ol>
-<p>This applies to normal, explict attribute fetch only. The implicit lookup of metod names for built-ins doesn’t follow these rules.</p>
-<p><strong>Assignment inheritance</strong></p>
-<p>When an attribute assignment is run for new-style classes, a data descriptor with <code>__set__</code> method is acquired from a class by inheritance using the MRO, and has precendence over the normal storage model. </p>
-<p><strong>The built-ins special case</strong></p>
-<p>TODO</p>
-<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>In this chapter, we studied metaclasses and explored examples of them in action. Metaclass allow us to tap into the class creation protocol of Python, in order to manage or augment user-defined classes. They may provide better solutions for API writers than manual code or helper functions.</p>
-<ol>
-<li><p><strong>What is a metaclass?</strong><br>A metaclass is a class used to create a class. Normal new-style classes are instances of the <strong>type</strong> class by default. Metaclass are usually subclass of the <strong>type</strong> class, which redifines class creation protocol methods in order to customize the class creation call issued at the end of a class statement; they typicall refined the methods <code>__new__</code> and <code>__init__</code> to tap into the class creation protocol. </p>
-</li>
-<li><p><strong>How do you declare the metaclass of a class?</strong><br>Python 2.x <code>__metaclass__ = M</code> Python 3.x <code>class C(metaclass=M)</code></p>
-</li>
-<li><p><strong>How do class decorators overlap with metaclasses for managing classes?</strong><br>Because both are automaticall triggered at the end of class statement, class decorators and metaclasses can both used to manage classes. Decorators rebind a class name to callable’s result and metaclass route class creation through a callaable, but hooks can be used for similar purpose. To manage classes, decorators simply augment and return the orign class object. Metaclass argument a class after they create it. Decorators may have a slight disadvantage in this role if a new class must be defined, because the original class has already been created.</p>
-</li>
-<li><p><strong>How doclass decorators overlap with metalcasses for managing instances?</strong><br>Becuase both automatically triggered at the end the class statement, we can use both class decorators and metaclass to manage class instance, by inserting a wrapper object to cath instance creation calls. Decorators my rebind the class name to callable run on instance creation that retains the original class object. Metaclass can do the same, but may hava a slight disadvantage in this role, because they must also create the class object.</p>
-</li>
-</ol>
-<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
-<li><em>Learning Python</em></li>
+<blockquote>
+<p>Note, 数据描述符的优先级 &gt; 普通属性 &gt; 非数据描述符</p>
+</blockquote>
+<h2 id="元类与类装饰器"><a href="#元类与类装饰器" class="headerlink" title="元类与类装饰器"></a>元类与类装饰器</h2><p>TODO</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>django ORM</p>
+<p>ripozo API</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><em>Learning Python 5th Edition</em></li>
 </ul>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;strong&gt;[Metaclasses] are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the peo
+      &lt;p&gt;&lt;em&gt;[Metaclasses] are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the people 
     
     </summary>
     
