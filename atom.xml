@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-07-18T14:57:26.000Z</updated>
+  <updated>2017-07-19T15:48:24.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,237 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OAuth</title>
+    <link href="http://blog.hotbaby.org/2017/07/19/untitled-1499683380864/"/>
+    <id>http://blog.hotbaby.org/2017/07/19/untitled-1499683380864/</id>
+    <published>2017-07-19T15:46:36.000Z</published>
+    <updated>2017-07-19T15:48:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>OAuth客户端使用一个访问令牌(access token)来访问受保护的资源，其中访问令牌包含了特殊作用域(specific scope), 生命周期，和其他的访问属性。访问令牌由授权服务器在资源拥有者授权之后颁发(issue)。客户端通过访问令牌资源服务器上受保护资源。</p>
+<p>比如，一个终端用户(resource-owner)可以授权打印服务器(client)访问他的存储在图片分享服务(resource server)上的受保护的图片，但不用与打印服务器分享他的用户名和密码。他可以授权图片分享服务(authorization server)颁发一个特殊的证书(access token).</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><h2 id="Roles"><a href="#Roles" class="headerlink" title="Roles"></a>Roles</h2><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>resource owner</td>
+<td>一个能授权访问受保护资源的实体</td>
+</tr>
+<tr>
+<td>resource server</td>
+<td>托管受保护资源的服务器，能处理通过访问令牌访问受保护资源的请求</td>
+</tr>
+<tr>
+<td>client</td>
+<td>代表资源拥有者发起访问受保护资源的请求的应用程序</td>
+</tr>
+<tr>
+<td>authorization server</td>
+<td>在资源拥有者认证、授权之后，能够颁发访问令牌给客户端的服务器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Protocol-Flow"><a href="#Protocol-Flow" class="headerlink" title="Protocol Flow"></a>Protocol Flow</h2><p><img src="https://hotbaby.org/images/1500477626596.png" alt="Abstract Protocol Flow"></p>
+<h2 id="Authorization-Grant"><a href="#Authorization-Grant" class="headerlink" title="Authorization Grant"></a>Authorization Grant</h2><p>授权grant是一个证书表示资源拥有者已经授权，客户端可以用授权grant获取访问令牌。该规范定义4种授权类型：</p>
+<ul>
+<li>authorization code</li>
+<li>implicit</li>
+<li>resource owner password credentials</li>
+<li>client credentials</li>
+</ul>
+<h2 id="Access-Token"><a href="#Access-Token" class="headerlink" title="Access Token"></a>Access Token</h2><p>访问令牌是一种证书用来访问受保护的资源。一个访问令牌就是认证服务器颁发给客户端的字符串。令牌包含了特殊作用域，过期时间，授权的资源拥有者等信息。</p>
+<h2 id="Refresh-Token"><a href="#Refresh-Token" class="headerlink" title="Refresh Token"></a>Refresh Token</h2><p>刷新令牌也是一个证书用来获取访问令牌。刷新令牌是认证服务器发放给客户端的，在当访问令牌不可用或过期时，用来获取新的访问令牌。</p>
+<p>刷新令牌是资源资源拥有者授权给客户端认证码。与访问令牌不同，刷新令牌只能与认证服务器通信，不能从资源服务器获取资源。</p>
+<p><img src="https://hotbaby.org/images/1500478188610.png" alt="Refreshing an Expired Access Token"></p>
+<h1 id="Client-Registration"><a href="#Client-Registration" class="headerlink" title="Client Registration"></a>Client Registration</h1><p>在使用OAuth协议之前，客户端需要在认证服务器注册应用。</p>
+<p>客户端注册是让认证服务器能够识别、信任客户端，其中包括客户端类型，重定向URI等。</p>
+<h2 id="Client-Types"><a href="#Client-Types" class="headerlink" title="Client Types"></a>Client Types</h2><p>OAuth定义了两种客户端类型</p>
+<ul>
+<li>confidential - 客户端能够管理证书的机密性</li>
+<li>public - 客户端不能管理证书的机密性</li>
+</ul>
+<h2 id="Client-Identifier"><a href="#Client-Identifier" class="headerlink" title="Client Identifier"></a>Client Identifier</h2><p>认证服务器给已注册的客户端颁发一个客户端标识。对于认证服务器，客户端标识是唯一的。</p>
+<h2 id="Client-Authentication"><a href="#Client-Authentication" class="headerlink" title="Client Authentication"></a>Client Authentication</h2><p>如果客户端类型是confidential, 客户端和认证服务器建立一个客户端认证方法。Confidential客户端会向认证服务器声明它支持证书，比如密码或公私钥对。</p>
+<h1 id="Obtaining-Authorization"><a href="#Obtaining-Authorization" class="headerlink" title="Obtaining Authorization"></a>Obtaining Authorization</h1><p>在请求访问令牌之前，客户端先要获取资源拥有者的授权。OAuth定义了4种授权类型: authorization code, implicit, resource owner password credential, 和client credentials.</p>
+<h2 id="Authorization-Code-Grant"><a href="#Authorization-Code-Grant" class="headerlink" title="Authorization Code Grant"></a>Authorization Code Grant</h2><p>授权码授权类型用来获取访问令牌和刷新令牌。</p>
+<p>认证码获取流程:</p>
+<p><img src="https://hotbaby.org/images/1500478492502.png" alt="Authorization Code Flow"></p>
+<h3 id="Authorization-Request"><a href="#Authorization-Request" class="headerlink" title="Authorization Request"></a>Authorization Request</h3><p><code>Content-Type: application/x-www-form-urlencoded</code></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>response_type</td>
+<td><strong>REQUIRED</strong>该值必须设置为”code”</td>
+</tr>
+<tr>
+<td>client_id</td>
+<td><strong>REQUIRED</strong>注册的应用的id</td>
+</tr>
+<tr>
+<td>redirect_uri</td>
+<td><strong>OPTIONAL</strong>重定向URI，成功获取授权码后重定向到oauth客户端的URI</td>
+</tr>
+<tr>
+<td>scope</td>
+<td><strong>OPTIONAL</strong>作用域</td>
+</tr>
+<tr>
+<td>state</td>
+<td><strong>RECOMMENDED</strong>客户端用来管理请求、回调状态的值。认证服务器的重定向到UA时，会包含这个值。<strong>这个参数应该用来防止扩展请求伪造</strong></td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">GET</span> <span class="string">/o/authorize/?response_type=code&amp;client_id=wt6Pvm2s3vbb8RPE7nlPlugwaMnj58UhFpk8bCPp&amp;redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Foauth%2Fauthorized%2F</span> HTTP/1.0</div><div class="line"><span class="attribute">Host</span>: localhost:8000</div><div class="line"><span class="attribute">Connection</span>: close</div><div class="line"><span class="attribute">Upgrade-Insecure-Requests</span>: 1</div><div class="line"><span class="attribute">User-Agent</span>: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36</div><div class="line"><span class="attribute">Accept</span>: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</div><div class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate, sdch, br</div><div class="line"><span class="attribute">Accept-Language</span>: en-US,en;q=0.8</div></pre></td></tr></table></figure>
+<p>认证服务器会验证这个请求，保证请求中的所有参数都是有效的。如果请求是有效的，认证服务器需要资源拥有者授权。如果资源拥有者授权成功，授权服务器根据<code>redirect_uri</code>返回给UA一个重定向响应。</p>
+<h3 id="Authorization-Response"><a href="#Authorization-Response" class="headerlink" title="Authorization Response"></a>Authorization Response</h3><p><code>Content-Type: application/x-www-form-urlencoded</code></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>code</td>
+<td><strong>REQUIRED</strong>认证服务器生成的授权码，为了防止泄露的危险，授权码必须在很短的时间过期。授权码生存期推荐为10min.客户端只能使用一次授权码。授权码与客户端id,重定向URI绑定</td>
+</tr>
+<tr>
+<td>state</td>
+<td><strong>REQUIRED</strong>如果客户端请求中包含state,授权服务器必须要返回该值</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">HTTP/1.0 <span class="number">302</span> Found</div><div class="line"><span class="attribute">Date</span>: Tue, 18 Jul 2017 04:12:00 GMT</div><div class="line"><span class="attribute">Server</span>: WSGIServer/0.1 Python/2.7.9</div><div class="line"><span class="attribute">X-Frame-Options</span>: SAMEORIGIN</div><div class="line"><span class="attribute">Access-Control-Allow-Origin</span>: *</div><div class="line"><span class="attribute">Content-Type</span>: text/html; charset=utf-8</div><div class="line"><span class="attribute">Location</span>: http://localhost:8000/oauth/authorized/?code=x1yxsYhAJ23pXNMXej4tB13dvMFTov</div><div class="line"><span class="attribute">Vary</span>: Cookie</div></pre></td></tr></table></figure>
+<h4 id="Error-Response"><a href="#Error-Response" class="headerlink" title="Error Response"></a>Error Response</h4><p><code>Conent-Type: application/x-www-form-urlencoded</code></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>error</td>
+<td><strong>REQUIRED</strong></td>
+</tr>
+<tr>
+<td>error_description</td>
+<td><strong>OPTIONAL</strong></td>
+</tr>
+<tr>
+<td>error_uri</td>
+<td><strong>OPTIONAL</strong></td>
+</tr>
+<tr>
+<td>state</td>
+<td><strong>REQUIRED</strong></td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 <span class="number">302</span> Found</div><div class="line"><span class="attribute">Location</span>: https://client.example.com/cb?error=access_denied&amp;state=xyz</div></pre></td></tr></table></figure>
+<h3 id="Access-Token-Request"><a href="#Access-Token-Request" class="headerlink" title="Access Token Request"></a>Access Token Request</h3><p><code>Conent-Type: application/x-www-form-urlencoded</code></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>grant_type</td>
+<td><strong>REQUIRED</strong>该值必须设置“authorization_code”</td>
+</tr>
+<tr>
+<td>code</td>
+<td><strong>REQUIRED</strong>授权服务器返回的code</td>
+</tr>
+<tr>
+<td>redirect_uri</td>
+<td><strong>REQUIRED</strong>重定向URI</td>
+</tr>
+<tr>
+<td>client_id</td>
+<td><strong>REQUIRED</strong>注册应用的ID</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">POST</span> <span class="string">/o/token/</span> HTTP/1.0</div><div class="line"><span class="attribute">Host</span>: localhost:8000</div><div class="line"><span class="attribute">Connection</span>: close</div><div class="line"><span class="attribute">Content-Length</span>: 183</div><div class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</div><div class="line"><span class="attribute">Accept</span>: */*</div><div class="line"><span class="attribute">User-Agent</span>: python-requests/2.18.1</div><div class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded</div><div class="line"></div><div class="line"><span class="undefined">grant_type=authorization_code&amp;code=x1yxsYhAJ23pXNMXej4tB13dvMFTov&amp;redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Foauth%2Fauthorized%2F&amp;client_id=wt6Pvm2s3vbb8RPE7nlPlugwaMnj58UhFpk8bCPp</span></div></pre></td></tr></table></figure>
+<p>认证服务器必须要验证客户端的请求</p>
+<ul>
+<li>对于confidential客户端，需要客户端认证</li>
+<li>如果客户端包含认证信息，认证客户端</li>
+<li>验证授权码是否有效</li>
+<li>验证redirect_uri是否证券</li>
+</ul>
+<h3 id="Access-Token-Response"><a href="#Access-Token-Response" class="headerlink" title="Access Token Response"></a>Access Token Response</h3><p>如果获取访问令牌的请求是有效的而且认证通过，认证服务器需要发放访问令牌和可选的刷新令牌。如果请求是无效的或认证失败，需要返回一个错误响应。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">HTTP/1.0 <span class="number">200</span> OK</div><div class="line"><span class="attribute">Date</span>: Tue, 18 Jul 2017 04:12:00 GMT</div><div class="line"><span class="attribute">Server</span>: WSGIServer/0.1 Python/2.7.9</div><div class="line"><span class="attribute">X-Frame-Options</span>: SAMEORIGIN</div><div class="line"><span class="attribute">Content-Type</span>: application/json</div><div class="line"><span class="attribute">Pragma</span>: no-cache</div><div class="line"><span class="attribute">Cache-Control</span>: no-store</div><div class="line"></div><div class="line"><span class="python">&#123;<span class="string">"access_token"</span>: <span class="string">"4C1gRp2TfYKN0tO45fqa6BkFZxTJNU"</span>, <span class="string">"token_type"</span>: <span class="string">"Bearer"</span>, <span class="string">"expires_in"</span>: <span class="number">36000</span>, <span class="string">"refresh_token"</span>: <span class="string">"oZX6XtV2OGSVRnvyOoa7qerWddOPKw"</span>, <span class="string">"scope"</span>: <span class="string">"read write"</span>&#125;</span></div></pre></td></tr></table></figure>
+<h1 id="Refreshing-an-Access-Token"><a href="#Refreshing-an-Access-Token" class="headerlink" title="Refreshing an Access Token"></a>Refreshing an Access Token</h1><p>如果认证服务器向客户端颁发了刷新令牌，客户端可以使用刷新令牌更新访问令牌。</p>
+<p><code>Content-Type: application/x-www-form-urlencoded</code></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>grant_type</td>
+<td><strong>REQUIRED</strong>该值必须设置为”refresh_token”</td>
+</tr>
+<tr>
+<td>refresh_token</td>
+<td><strong>REQUIRED</strong>认证服务器颁发的刷新令牌</td>
+</tr>
+<tr>
+<td>scope</td>
+<td><strong>OPTIONAL</strong></td>
+</tr>
+</tbody>
+</table>
+<p>刷新令牌是长期存在证书用来更新访问令牌，刷新令牌必须要与客户端id绑定。此外，客户端必须向认证服务器提供认证信息。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">POST</span> <span class="string">/o/token/</span> HTTP/1.0</div><div class="line"><span class="attribute">Host</span>: localhost:8000</div><div class="line"><span class="attribute">Connection</span>: close</div><div class="line"><span class="attribute">Content-Length</span>: 69</div><div class="line"><span class="attribute">Accept-Encoding</span>: gzip, deflate</div><div class="line"><span class="attribute">Accept</span>: */*</div><div class="line"><span class="attribute">User-Agent</span>: python-requests/2.18.1</div><div class="line"><span class="attribute">Content-Type</span>: application/x-www-form-urlencoded</div><div class="line"><span class="attribute">Authorization</span>: Basic d3Q2UHZtMnMzdmJiOFJQRTdubFBsdWd3YU1uajU4VWhGcGs4YkNQcDpWcUF3NDlwb3VXc0lUVU1OcWFrdzczQ0NSRVZzclMyRWd5SG9WeVJnekpWNWRlWnNKQUNBeVdkeEFJMXZRc2RaZk1JQmlCRlRFeUR5YUkyeTJJcU1vR3JEbkFNWE5ITWd4TFRJUDIxRXhIR0tkUmNTVlJ5RjRxOHA5STR5OWhqVQ==</div><div class="line"></div><div class="line"><span class="undefined">grant_type=refresh_token&amp;refresh_token=oZX6XtV2OGSVRnvyOoa7qerWddOPKw</span></div></pre></td></tr></table></figure>
+<p>Response:</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">HTTP/1.0 <span class="number">200</span> OK</div><div class="line"><span class="attribute">Date</span>: Tue, 18 Jul 2017 06:47:50 GMT</div><div class="line"><span class="attribute">Server</span>: WSGIServer/0.1 Python/2.7.9</div><div class="line"><span class="attribute">X-Frame-Options</span>: SAMEORIGIN</div><div class="line"><span class="attribute">Content-Type</span>: application/json</div><div class="line"><span class="attribute">Pragma</span>: no-cache</div><div class="line"><span class="attribute">Cache-Control</span>: no-store</div><div class="line"></div><div class="line"><span class="python">&#123;<span class="string">"access_token"</span>: <span class="string">"gebkQX71vIwmksTsvleRKMzpdysLHY"</span>, <span class="string">"token_type"</span>: <span class="string">"Bearer"</span>, <span class="string">"expires_in"</span>: <span class="number">36000</span>, <span class="string">"refresh_token"</span>: <span class="string">"CbpaNXAqyexTQOuCvQf1RUoEN2EZeX"</span>, <span class="string">"scope"</span>: <span class="string">"read write"</span>&#125;</span></div></pre></td></tr></table></figure>
+<h1 id="Accessing-Protected-Resources"><a href="#Accessing-Protected-Resources" class="headerlink" title="Accessing Protected Resources"></a>Accessing Protected Resources</h1><p>客户端可以同访问访问资源服务器受保护的资源。资源服务器必须要验证访问令牌，保证访问令牌没有过期，并且其作用域能覆盖此资源。</p>
+<h2 id="Access-Token-Types"><a href="#Access-Token-Types" class="headerlink" title="Access Token Types"></a>Access Token Types</h2><p>“bearer”令牌类型，参考<a href="https://tools.ietf.org/html/rfc6750" target="_blank" rel="external">RFC6750</a></p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">GET</span> <span class="string">/resource/1</span> HTTP/1.1</div><div class="line"><span class="attribute">Host</span>: example.com</div><div class="line"><span class="attribute">Authorization</span>: Bearer mF_9.B5f-4.1JqM</div></pre></td></tr></table></figure>
+<p>“mac”令牌类型</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">GET /resource/1 HTTP/1.1</div><div class="line">Host: example.com</div><div class="line">Authorization: MAC id="h480djs93hd8",</div><div class="line">               nonce="274312:dj83hs9s",</div><div class="line">               mac="kDZvddkndxvhGRXZhvuDjEWhGeE="</div></pre></td></tr></table></figure>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a href="https://oauth.net/2/" target="_blank" rel="external">https://oauth.net/2/</a></li>
+<li><a href="https://tools.ietf.org/html/rfc6749" target="_blank" rel="external">https://tools.ietf.org/html/rfc6749</a></li>
+<li><a href="https://github.com/evonove/django-oauth-toolkit" target="_blank" rel="external">https://github.com/evonove/django-oauth-toolkit</a></li>
+<li><a href="https://oauth.net/articles/authentication/" target="_blank" rel="external">https://oauth.net/articles/authentication/</a></li>
+<li><a href="https://www.oauth.com" target="_blank" rel="external">https://www.oauth.com</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;OAuth客户端使用一个访问令牌(access token)来访问受保护的资源，其中访问令牌包含了特殊作用域(specific scope), 生命周期，和其他的访问属性。访问令牌由授权服务器在资源拥有者授权之后颁发(issue)。客户端通过访问令牌资源服务器上受保护资源。
+    
+    </summary>
+    
+    
+      <category term="OAuth" scheme="http://blog.hotbaby.org/tags/OAuth/"/>
+    
+  </entry>
   
   <entry>
     <title>Python Metaclass</title>
@@ -851,69 +1082,6 @@
     
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Git</title>
-    <link href="http://blog.hotbaby.org/2017/04/19/git/"/>
-    <id>http://blog.hotbaby.org/2017/04/19/git/</id>
-    <published>2017-04-19T10:31:00.000Z</published>
-    <updated>2017-06-26T01:32:43.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed and efficiency.</p>
-<h2 id="custom-domain-redirect"><a href="#custom-domain-redirect" class="headerlink" title="custom domain redirect"></a>custom domain redirect</h2><p>添加DNS解析记录：</p>
-<table>
-<thead>
-<tr>
-<th>记录类型</th>
-<th>主机记录</th>
-<th>记录值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CNAME</td>
-<td>blog</td>
-<td>hotbaby.github.io</td>
-</tr>
-</tbody>
-</table>
-<p>修改GitHub pages CNAME记录：</p>
-<p>创建CNAME文件，并写入域名。 比如<code>echo &#39;blog.mengyangyang.org&#39; &gt;&gt; CNAME</code></p>
-<p>hexo 更新覆盖CNAME:</p>
-<p>在<code>source</code>目录下创建CNAME文件，并写入域名</p>
-<h2 id="submodule"><a href="#submodule" class="headerlink" title="submodule"></a>submodule</h2><p>以引用PCI项目为例，介绍如何添加子模块</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ git <span class="built_in">clone</span> git@github.com:hotbaby/PCI.git</div><div class="line">$ git submodule add https://github.com/uolter/PCI.git code/origin</div><div class="line">$ git commit -m <span class="string">'Add PCI submodule.'</span></div><div class="line">$ git push</div></pre></td></tr></table></figure>
-<h2 id="tag"><a href="#tag" class="headerlink" title="tag"></a>tag</h2><p>添加tag</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git tag tag_name</div><div class="line">$ git push origin tag_name</div><div class="line">$ git push origin --tags</div></pre></td></tr></table></figure>
-<p>某次提交打tag</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ git tag <span class="_">-a</span> tag_name commit_id</div><div class="line">$ git push origin tag_name</div><div class="line">$ git push origin --tags <span class="comment"># 全部tags</span></div></pre></td></tr></table></figure>
-<p>查看tag</p>
-<p><code>git tag --list</code></p>
-<p>切换到tag</p>
-<p><code>git check tag_name</code></p>
-<p>删除tag<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git tag <span class="_">-d</span> tag_name <span class="comment">#删除本地tag</span></div><div class="line">$ git push  origin --delete tag &lt;tag_name&gt; <span class="comment">#删除服务器tag</span></div></pre></td></tr></table></figure></p>
-<h2 id="config"><a href="#config" class="headerlink" title="config"></a>config</h2><p>编辑配置文件：</p>
-<p><code>vim ~/.gitconfig</code></p>
-<p>配置编辑器：</p>
-<p><code>git config --global core.editor vim</code></p>
-<h2 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h2><ul>
-<li><a href="https://git-scm.com/book/zh/v1/Git-%E5%B7%A5%E5%85%B7-%E5%AD%90%E6%A8%A1%E5%9D%97" target="_blank" rel="external">Git子模块</a></li>
-<li><a href="http://wonux.tech/git-git-submodule.html" target="_blank" rel="external">Git子模块引用外部项目</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Git is a free and open source distribute version control system designed to handle evertything from small to very large project wit speed
-    
-    </summary>
-    
-      <category term="git" scheme="http://blog.hotbaby.org/categories/git/"/>
-    
-    
-      <category term="git" scheme="http://blog.hotbaby.org/tags/git/"/>
     
   </entry>
   
