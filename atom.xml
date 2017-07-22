@@ -321,11 +321,11 @@
   </entry>
   
   <entry>
-    <title>Python  descriptor</title>
+    <title>Python  Descriptor</title>
     <link href="http://blog.hotbaby.org/2017/07/10/Python-descriptor/"/>
     <id>http://blog.hotbaby.org/2017/07/10/Python-descriptor/</id>
     <published>2017-07-10T15:58:38.000Z</published>
-    <updated>2017-07-10T16:00:32.000Z</updated>
+    <updated>2017-07-21T09:19:40.000Z</updated>
     
     <content type="html"><![CDATA[<p>如果一个对象定义了以下任意方法，这个对象就是一个描述符。给描述符下个定义，描述符就是绑定了行为属性的对象。</p>
 <p><code>object.__get__(self, instance, owner)</code></p>
@@ -402,11 +402,11 @@
   </entry>
   
   <entry>
-    <title>Python context</title>
+    <title>Python Context</title>
     <link href="http://blog.hotbaby.org/2017/07/09/Python-context/"/>
     <id>http://blog.hotbaby.org/2017/07/09/Python-context/</id>
     <published>2017-07-09T13:52:12.000Z</published>
-    <updated>2017-07-10T01:33:30.000Z</updated>
+    <updated>2017-07-21T09:19:24.000Z</updated>
     
     <content type="html"><![CDATA[<p>上下管理器是一个对象，定义了执行<code>with</code>语句时需要创建的上下文。context manager的<code>__enter__()</code>和<code>__exit__()</code>方法分别在进入、退出<code>with</code>语句时被调用。</p>
 <p><code>object.__enter__(self)</code></p>
@@ -453,11 +453,11 @@
   </entry>
   
   <entry>
-    <title>Python debug</title>
+    <title>Python Debug</title>
     <link href="http://blog.hotbaby.org/2017/06/09/Python-debug/"/>
     <id>http://blog.hotbaby.org/2017/06/09/Python-debug/</id>
     <published>2017-06-09T10:09:52.000Z</published>
-    <updated>2017-06-09T10:41:49.000Z</updated>
+    <updated>2017-07-21T09:19:55.000Z</updated>
     
     <content type="html"><![CDATA[<p>Debug Python程序。</p>
 <h2 id="pdb"><a href="#pdb" class="headerlink" title="pdb"></a>pdb</h2><h2 id="pyringe"><a href="#pyringe" class="headerlink" title="pyringe"></a>pyringe</h2><p>pdb不支持attch正在运行的Python程序，pyringe很好的解决此问题。此外，pyringe支持代码自省，查看局部变量、全局变量，代码注入，查看线程列表，打印栈帧。</p>
@@ -480,11 +480,11 @@
   </entry>
   
   <entry>
-    <title>debian timezone</title>
+    <title>Debian Timezone</title>
     <link href="http://blog.hotbaby.org/2017/06/09/debian-timezone/"/>
     <id>http://blog.hotbaby.org/2017/06/09/debian-timezone/</id>
     <published>2017-06-09T09:20:49.000Z</published>
-    <updated>2017-06-09T09:21:08.000Z</updated>
+    <updated>2017-07-21T09:20:51.000Z</updated>
     
     <content type="html"><![CDATA[<p><code>dpkg-reconfigure  tzdata</code></p>
 <p><strong>Referece</strong></p>
@@ -506,11 +506,11 @@
   </entry>
   
   <entry>
-    <title>Python customization</title>
+    <title>Python Customization</title>
     <link href="http://blog.hotbaby.org/2017/06/09/Python-customization/"/>
     <id>http://blog.hotbaby.org/2017/06/09/Python-customization/</id>
     <published>2017-06-09T04:20:00.000Z</published>
-    <updated>2017-06-12T00:57:06.000Z</updated>
+    <updated>2017-07-21T09:21:37.000Z</updated>
     
     <content type="html"><![CDATA[<p><strong><code>object.__new__(cls[, ...])</code></strong></p>
 <p><code>object.__new__(cls, *args, **kwargs)</code> Called to create a new instance of class <code>cls.__new__()</code>is <strong>a static method</strong> that take the class as its first argument.The remaining arguments are those passed to the object constructor expression(the call to the class). <strong>The return value of <code>__new__()</code>should be the new object instance(usually an instance of cls).</strong></p>
@@ -548,11 +548,11 @@
   </entry>
   
   <entry>
-    <title>Python pip mirror</title>
+    <title>Python PyPI Mirror</title>
     <link href="http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/"/>
     <id>http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/</id>
     <published>2017-06-08T06:22:00.000Z</published>
-    <updated>2017-06-08T06:46:17.000Z</updated>
+    <updated>2017-07-21T09:35:42.000Z</updated>
     
     <content type="html"><![CDATA[<p>PyPI(Python Package Index)是Python软件仓库。</p>
 <p>pip是Python包管理工具，默认使用<code>pypi.python.org</code>作为PyPI的镜像。</p>
@@ -647,11 +647,11 @@
   </entry>
   
   <entry>
-    <title>Django database router</title>
+    <title>Django Database Router</title>
     <link href="http://blog.hotbaby.org/2017/05/17/django-db-router/"/>
     <id>http://blog.hotbaby.org/2017/05/17/django-db-router/</id>
     <published>2017-05-17T11:56:00.000Z</published>
-    <updated>2017-05-17T12:20:29.000Z</updated>
+    <updated>2017-07-21T09:21:25.000Z</updated>
     
     <content type="html"><![CDATA[<p>django ORM数据模型配置数据库．</p>
 <p>django支持多个数据库，通过django ORM定义数据模型，比如<code>class User(Model)</code>，无法通过<code>class Meta</code>配置管理该数据模型对应的数据库，只能使用默认数据库<code>default</code>．</p>
@@ -690,7 +690,7 @@
     <link href="http://blog.hotbaby.org/2017/05/17/http-cache/"/>
     <id>http://blog.hotbaby.org/2017/05/17/http-cache/</id>
     <published>2017-05-17T03:00:36.000Z</published>
-    <updated>2017-07-17T01:56:02.000Z</updated>
+    <updated>2017-07-21T01:48:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>缓存是一种用来存储资源副本的技术．</p>
 <h1 id="HTTP-缓存"><a href="#HTTP-缓存" class="headerlink" title="HTTP 缓存"></a>HTTP 缓存</h1><h2 id="不同类型的缓存"><a href="#不同类型的缓存" class="headerlink" title="不同类型的缓存"></a>不同类型的缓存</h2><p>缓存的目标：</p>
@@ -726,6 +726,7 @@
 <li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
 <li><a href="https://www.mnot.net/cache_docs/" target="_blank" rel="external">Caching Tutorial</a></li>
 <li><a href="https://redbot.org/" target="_blank" rel="external">redbot</a>, a tool to check your cache-related HTTP headers.</li>
+<li><a href="https://www.ietf.org/rfc/rfc2616.txt" target="_blank" rel="external">Hypertext Transfer Protocol – HTTP/1.1</a></li>
 </ul>
 ]]></content>
     
@@ -785,11 +786,11 @@
   </entry>
   
   <entry>
-    <title>JSON resources</title>
+    <title>JSON Resources</title>
     <link href="http://blog.hotbaby.org/2017/05/16/json-protocols/"/>
     <id>http://blog.hotbaby.org/2017/05/16/json-protocols/</id>
     <published>2017-05-16T01:58:00.000Z</published>
-    <updated>2017-05-17T12:38:09.000Z</updated>
+    <updated>2017-07-21T09:36:05.000Z</updated>
     
     <content type="html"><![CDATA[<p><strong>JSNO-RPC</strong></p>
 <p>A light weight remote procedure call protocol.</p>
@@ -823,11 +824,11 @@
   </entry>
   
   <entry>
-    <title>Flask signal</title>
+    <title>Flask Signal</title>
     <link href="http://blog.hotbaby.org/2017/05/14/Flask-signal/"/>
     <id>http://blog.hotbaby.org/2017/05/14/Flask-signal/</id>
     <published>2017-05-14T08:50:08.000Z</published>
-    <updated>2017-05-17T03:23:44.000Z</updated>
+    <updated>2017-07-21T09:23:21.000Z</updated>
     
     <content type="html"><![CDATA[<p>Flask signals 默认没有自己实现signal，而是使用blink进行信号的定义，连接，分发。</p>
 <h2 id="Flask-singal"><a href="#Flask-singal" class="headerlink" title="Flask singal"></a>Flask singal</h2><p>flask未实现自己信号处理,而是使用blink.</p>
@@ -992,14 +993,13 @@
   </entry>
   
   <entry>
-    <title>hacker ethic</title>
+    <title>Hacker Ethic</title>
     <link href="http://blog.hotbaby.org/2017/04/28/%E9%BB%91%E5%AE%A2%E4%BC%A6%E7%90%86/"/>
     <id>http://blog.hotbaby.org/2017/04/28/黑客伦理/</id>
     <published>2017-04-28T09:29:44.000Z</published>
-    <updated>2017-05-06T03:38:16.000Z</updated>
+    <updated>2017-07-21T09:35:10.000Z</updated>
     
-    <content type="html"><![CDATA[<p>hacker ethic</p>
-<ol>
+    <content type="html"><![CDATA[<ol>
 <li>Access to computers and anything that might teach you something about the way the world works - should be unlimited and total. Always yield to the hands-on imperative.</li>
 <li>All information should be free.</li>
 <li>Mitrust Authority, Promote Decentralization.</li>
@@ -1023,9 +1023,8 @@
     
     <summary type="html">
     
-      &lt;p&gt;hacker ethic&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Access to computers and anything that might teach you something about the way the world works - should be unlim
+      &lt;ol&gt;
+&lt;li&gt;Access to computers and anything that might teach you something about the way the world works - should be unlimited and total. Alwa
     
     </summary>
     
@@ -1033,11 +1032,11 @@
   </entry>
   
   <entry>
-    <title>Django signal</title>
+    <title>Django Signal</title>
     <link href="http://blog.hotbaby.org/2017/04/20/django-signals/"/>
     <id>http://blog.hotbaby.org/2017/04/20/django-signals/</id>
     <published>2017-04-20T15:45:00.000Z</published>
-    <updated>2017-06-15T07:24:00.000Z</updated>
+    <updated>2017-07-21T09:33:15.000Z</updated>
     
     <content type="html"><![CDATA[<p>信号实现了一个复杂系统中子系统之间的解耦，一个子系统的状态发生改变时，通过信号同步（或通知）其他依赖于该系统的系统更新状态，实现了状态的一致性。</p>
 <p>不同于flask，直接使用blinker，django内部实现了信号处理机制。</p>
