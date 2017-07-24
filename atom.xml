@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-07-19T15:48:24.000Z</updated>
+  <updated>2017-07-23T09:04:28.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,65 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HTTP Cache</title>
+    <link href="http://blog.hotbaby.org/2017/07/23/http-cache/"/>
+    <id>http://blog.hotbaby.org/2017/07/23/http-cache/</id>
+    <published>2017-07-23T09:04:28.000Z</published>
+    <updated>2017-07-23T09:04:28.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>缓存是某个资源(或文档)的副本。对于私有缓存，可以服务同一个客户端的对同一个资源多次的请求，比如浏览器缓存。对于共享缓存(或代理缓存)，可以服务多个客户端对于同一个资源的请求，比如CDN。为什么需要缓存，缓存有哪些优点：</p>
+<ul>
+<li>减少网络延迟，更快的加载内容，提高用户体验</li>
+<li>减少冗余数据传输，降低网络负载</li>
+<li>降低服务器负载，服务器可以更快的处理请求</li>
+</ul>
+<h2 id="不同类型的缓存"><a href="#不同类型的缓存" class="headerlink" title="不同类型的缓存"></a>不同类型的缓存</h2><ul>
+<li>私有缓存 - 服务于单个用户</li>
+<li>共享缓存 -　存储响应被很多用户复用</li>
+</ul>
+<p>其他缓存，gateway cache, CDN, reverse proxy cache 和　部署在服务器上的负载均衡器，以获得更好的可靠性，性能．</p>
+<p><img src="http://www.processon.com/chart_image/59746649e4b066da2d53d780.png" alt="HTTP Cache Type"></p>
+<p><strong>私有浏览器缓存(Private browser cache)</strong></p>
+<p>私有缓存服务于单个用户．</p>
+<h3 id="共享代理缓存-Shared-proxy-caches"><a href="#共享代理缓存-Shared-proxy-caches" class="headerlink" title="共享代理缓存(Shared proxy caches)"></a>共享代理缓存(Shared proxy caches)</h3><p>共享缓存服务于多个用户．比如ISP或者企业可以配置一个web代理，作为本地网络基础架构，服务于多个用户．热点资源可以被多个用户复用，减少网络流量和延迟．　</p>
+<h2 id="缓存操作的目标"><a href="#缓存操作的目标" class="headerlink" title="缓存操作的目标"></a>缓存操作的目标</h2><p>HTTP缓存是可选的，有的时候并不希望复用缓存资源。</p>
+<p>常用的缓存条目的形式：</p>
+<ul>
+<li>成功的检索请求结果 - 200 OK响应，比如HTML 文档，图片或者文件</li>
+<li>永久重定向 - 301(Moved Permanently)响应</li>
+<li>错误响应 - 404(Not Found)结果页</li>
+<li>未完成的结果 - 206(Partial Content)响应</li>
+<li>不仅仅是GET请求的响应 - 定义一个合适的cache key</li>
+</ul>
+<h2 id="缓存控制-Controlling-caching"><a href="#缓存控制-Controlling-caching" class="headerlink" title="缓存控制(Controlling caching)"></a>缓存控制(Controlling caching)</h2><h3 id="缓存控制头部-The-Cache-control-header"><a href="#缓存控制头部-The-Cache-control-header" class="headerlink" title="缓存控制头部(The Cache-control header)"></a>缓存控制头部(The Cache-control header)</h3><h3 id="Pragma头-The-Pragma-header"><a href="#Pragma头-The-Pragma-header" class="headerlink" title="Pragma头(The Pragma header)"></a>Pragma头(The Pragma header)</h3><h2 id="新鲜度-Freshness"><a href="#新鲜度-Freshness" class="headerlink" title="新鲜度(Freshness)"></a>新鲜度(Freshness)</h2><h3 id="Revved-资源"><a href="#Revved-资源" class="headerlink" title="Revved 资源"></a>Revved 资源</h3><h2 id="缓存验证-Cache-validation"><a href="#缓存验证-Cache-validation" class="headerlink" title="缓存验证(Cache validation)"></a>缓存验证(Cache validation)</h2><h3 id="ETags"><a href="#ETags" class="headerlink" title="ETags"></a>ETags</h3><h2 id="Varying-responses"><a href="#Varying-responses" class="headerlink" title="Varying responses"></a>Varying responses</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="external">rfc7234  Hypertext Transfer Protocol (HTTP/1.1): Caching</a></li>
+<li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
+<li><a href="https://www.mnot.net/cache_docs/" target="_blank" rel="external">Caching Tutorial</a></li>
+<li><a href="https://redbot.org/" target="_blank" rel="external">redbot</a>, a tool to check your cache-related HTTP headers.</li>
+<li><a href="https://www.ietf.org/rfc/rfc2616.txt" target="_blank" rel="external">Hypertext Transfer Protocol – HTTP/1.1</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;缓存是某个资源(或文档)的副本。对于私有缓存，可以服务同一个客户端的对同一个资源多次的请求，比如浏览器缓存。对于共享缓存(或代理缓存)，可以服务多个客户端对于同一个资源的请求，比如CDN。为什么需要缓存，缓存有哪些优点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;减少网络延迟，更快的加载内
+    
+    </summary>
+    
+    
+      <category term="cache" scheme="http://blog.hotbaby.org/tags/cache/"/>
+    
+      <category term="HTTP" scheme="http://blog.hotbaby.org/tags/HTTP/"/>
+    
+  </entry>
   
   <entry>
     <title>OAuth</title>
@@ -682,65 +741,6 @@
     
     
       <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HTTP Cache</title>
-    <link href="http://blog.hotbaby.org/2017/05/17/http-cache/"/>
-    <id>http://blog.hotbaby.org/2017/05/17/http-cache/</id>
-    <published>2017-05-17T03:00:36.000Z</published>
-    <updated>2017-07-21T01:48:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>缓存是一种用来存储资源副本的技术．</p>
-<h1 id="HTTP-缓存"><a href="#HTTP-缓存" class="headerlink" title="HTTP 缓存"></a>HTTP 缓存</h1><h2 id="不同类型的缓存"><a href="#不同类型的缓存" class="headerlink" title="不同类型的缓存"></a>不同类型的缓存</h2><p>缓存的目标：</p>
-<ul>
-<li>减小服务器的负载，服务器不需要负责服务所有的客户端请求</li>
-<li>需要更少的时间回传资源</li>
-<li>…</li>
-</ul>
-<p>不同类型的缓存</p>
-<ul>
-<li>共享缓存 -　存储响应被很多用户复用</li>
-<li>私有缓存 - 服务于单个用户</li>
-</ul>
-<p>其他缓存，gateway cache, CDN, reverse proxy cache 和　部署在服务器上的负载均衡器，以获得更好的可靠性，性能．</p>
-<p><img src="https://mdn.mozillademos.org/files/13777/HTTPCachtType.png" alt=""></p>
-<h3 id="私有浏览器缓存-Private-browser-cache"><a href="#私有浏览器缓存-Private-browser-cache" class="headerlink" title="私有浏览器缓存(Private browser cache)"></a>私有浏览器缓存(Private browser cache)</h3><p>私有缓存服务于单个用户．</p>
-<h3 id="共享代理缓存-Shared-proxy-caches"><a href="#共享代理缓存-Shared-proxy-caches" class="headerlink" title="共享代理缓存(Shared proxy caches)"></a>共享代理缓存(Shared proxy caches)</h3><p>共享缓存服务于多个用户．比如ISP或者企业可以配置一个web代理，作为本地网络基础架构，服务于多个用户．热点资源可以被多个用户复用，减少网络流量和延迟．　</p>
-<h2 id="缓存操作的目标"><a href="#缓存操作的目标" class="headerlink" title="缓存操作的目标"></a>缓存操作的目标</h2><p>HTTP缓存是可选的，有的时候并不希望复用缓存资源。</p>
-<p>常用的缓存条目的形式：</p>
-<ul>
-<li>成功的检索请求结果 - 200 OK响应，比如HTML 文档，图片或者文件</li>
-<li>永久重定向 - 301(Moved Permanently)响应</li>
-<li>错误响应 - 404(Not Found)结果页</li>
-<li>未完成的结果 - 206(Partial Content)响应</li>
-<li>不仅仅是GET请求的响应 - 定义一个合适的cache key</li>
-</ul>
-<h2 id="缓存控制-Controlling-caching"><a href="#缓存控制-Controlling-caching" class="headerlink" title="缓存控制(Controlling caching)"></a>缓存控制(Controlling caching)</h2><h3 id="缓存控制头部-The-Cache-control-header"><a href="#缓存控制头部-The-Cache-control-header" class="headerlink" title="缓存控制头部(The Cache-control header)"></a>缓存控制头部(The Cache-control header)</h3><h3 id="Pragma头-The-Pragma-header"><a href="#Pragma头-The-Pragma-header" class="headerlink" title="Pragma头(The Pragma header)"></a>Pragma头(The Pragma header)</h3><h2 id="新鲜度-Freshness"><a href="#新鲜度-Freshness" class="headerlink" title="新鲜度(Freshness)"></a>新鲜度(Freshness)</h2><h3 id="Revved-资源"><a href="#Revved-资源" class="headerlink" title="Revved 资源"></a>Revved 资源</h3><h2 id="缓存验证-Cache-validation"><a href="#缓存验证-Cache-validation" class="headerlink" title="缓存验证(Cache validation)"></a>缓存验证(Cache validation)</h2><h3 id="ETags"><a href="#ETags" class="headerlink" title="ETags"></a>ETags</h3><h2 id="Varying-responses"><a href="#Varying-responses" class="headerlink" title="Varying responses"></a>Varying responses</h2><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching</a></li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control</a></li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires</a></li>
-<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified</a></li>
-<li><a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="external">rfc7234  Hypertext Transfer Protocol (HTTP/1.1): Caching</a></li>
-<li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
-<li><a href="https://www.mnot.net/cache_docs/" target="_blank" rel="external">Caching Tutorial</a></li>
-<li><a href="https://redbot.org/" target="_blank" rel="external">redbot</a>, a tool to check your cache-related HTTP headers.</li>
-<li><a href="https://www.ietf.org/rfc/rfc2616.txt" target="_blank" rel="external">Hypertext Transfer Protocol – HTTP/1.1</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;缓存是一种用来存储资源副本的技术．&lt;/p&gt;
-&lt;h1 id=&quot;HTTP-缓存&quot;&gt;&lt;a href=&quot;#HTTP-缓存&quot; class=&quot;headerlink&quot; title=&quot;HTTP 缓存&quot;&gt;&lt;/a&gt;HTTP 缓存&lt;/h1&gt;&lt;h2 id=&quot;不同类型的缓存&quot;&gt;&lt;a href=&quot;#不
-    
-    </summary>
-    
-    
-      <category term="cache" scheme="http://blog.hotbaby.org/tags/cache/"/>
-    
-      <category term="HTTP" scheme="http://blog.hotbaby.org/tags/HTTP/"/>
     
   </entry>
   
