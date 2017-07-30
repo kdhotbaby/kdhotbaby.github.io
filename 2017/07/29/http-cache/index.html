@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="hotbaby's blog"><title>HTTP Cache | hotbaby</title><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/5.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">HTTP Cache</h1><a id="logo" href="/.">hotbaby</a><p class="description">hotbaby's blog</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/history/"><i class="fa fa-history"> 历史</i></a><a href="/guestbook/"><i class="fa fa-comments"> 留言</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">HTTP Cache</h1><div class="post-meta">Jul 29, 2017<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><a data-disqus-identifier="2017/07/29/http-cache/" href="/2017/07/29/http-cache/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>缓存是某个资源(或文档)的副本。对于私有缓存，可以服务同一个客户端的对同一个资源多次的请求，比如浏览器缓存。对于共享缓存(或代理缓存)，可以服务多个客户端对于同一个资源的请求，比如CDN。为什么需要缓存，缓存有哪些优点：</p>
+<ul>
+<li>减少网络延迟，更快的加载内容，提高用户体验</li>
+<li>减少冗余数据传输，降低网络负载</li>
+<li>降低服务器负载，服务器可以更快的处理请求</li>
+</ul>
+<h2 id="不同类型的缓存"><a href="#不同类型的缓存" class="headerlink" title="不同类型的缓存"></a>不同类型的缓存</h2><ul>
+<li>私有缓存 - 服务于单个用户</li>
+<li>共享缓存 -存储响应被很多用户复用</li>
+</ul>
+<p>其他缓存，gateway cache, CDN, reverse proxy cache 和　部署在服务器上的负载均衡器，以获得更好的可靠性和性能．</p>
+<p><img src="http://www.processon.com/chart_image/597c3deee4b06e43d2d663b5.png" alt="HTTP Cache Type"></p>
+<p><strong>私有浏览器缓存(Private browser cache)</strong></p>
+<p>私有缓存服务于单个用户．</p>
+<h3 id="共享代理缓存-Shared-proxy-caches"><a href="#共享代理缓存-Shared-proxy-caches" class="headerlink" title="共享代理缓存(Shared proxy caches)"></a>共享代理缓存(Shared proxy caches)</h3><p>共享缓存服务于多个用户．比如ISP或者企业可以配置一个web代理，作为本地网络基础架构，服务于多个用户．热点资源可以被多个用户复用，减少网络流量和延迟．　</p>
+<p>常用的缓存条目的形式：</p>
+<ul>
+<li>成功的检索请求结果 - 200 OK响应，比如HTML 文档，图片或者文件</li>
+<li>永久重定向 - 301(Moved Permanently)响应</li>
+<li>错误响应 - 404(Not Found)结果页</li>
+<li>未完成的结果 - 206(Partial Content)响应</li>
+<li>不仅仅是GET请求的响应 - 定义一个合适的cache key</li>
+</ul>
+<h2 id="缓存处理步骤"><a href="#缓存处理步骤" class="headerlink" title="缓存处理步骤"></a>缓存处理步骤</h2><p>对于一个HTTP GET请求报文，基本缓存处理包含7个步骤：</p>
+<ol>
+<li>接收-缓存从网络中读取请求报文</li>
+<li>解析-缓存对报文进行解析，提取HTTP首部信息</li>
+<li>查询-缓存查询是否命中，如果没有，则从源服务器获取，并缓存到本地</li>
+<li>新鲜度检测-检查副本是否新鲜，如果不新鲜，则与源服务器进行验证</li>
+<li>响应-缓存用新的首部和缓存主体创建响应报文</li>
+<li>发送-缓存通过网络将响应发送给客户端</li>
+<li>日志-缓存记录这次请求的日志</li>
+</ol>
+<p>缓存处理流程图：<br><img src="http://www.processon.com/chart_image/597ca20ee4b06e43d2d675ec.png" alt="HTTP_CACHE_GET_FLOW_CHART"></p>
+<h2 id="缓存控制"><a href="#缓存控制" class="headerlink" title="缓存控制"></a>缓存控制</h2><p>服务器可以通过HTTP定义文档过期之前可以将其缓存多长时间。</p>
+<ul>
+<li>Cache-Control: no-store</li>
+<li>Cache-Control: no-cache</li>
+<li>Cache-Control: must-revalidate</li>
+<li>Cache-Control: max-age</li>
+<li>Expires</li>
+</ul>
+<p>no-store与no-cache</p>
+<p>HTTP/1.1提供了几种限制对象缓存方式。 no-store和no-cache首部可以防止缓存未经证实的已缓存对象：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">Pragma</span>: no-cache</div><div class="line"><span class="attribute">Cache-Control</span>: no-store</div><div class="line"><span class="attribute">Cache-Control</span>: no-cache</div></pre></td></tr></table></figure>
+<p>标识为<code>no-store</code>的响应回禁止缓存对响应进行复制。标识为<code>no-cache</code>的响应可以在本地缓存中，只是在与服务器进行新鲜度再验证之前，缓存不能提供给客户端使用。</p>
+<p><code>Cache-Control: max-age=3600</code>表示收到服务器响应文档处于新鲜状态的秒数。max-age=0表示不缓存文档。</p>
+<p><code>Expires: Fri, 05 Jul 2017, 12:00:00 GMT</code>表示文档绝对过期时间。<strong>不推荐使用Expires</strong>，HTTP设计者后来任务，由于服务器之间的时间不同步或不正确，会导致文档新鲜度计算错误。</p>
+<p>如果源服务器希望缓存严格遵守过期时间，可以在加<code>Cache-Control: must-revalidate</code>的HTTP首部。<code>Cache-Control: must-revalidate</code>响应告诉缓存，在事先没有跟源服务器再验证之前，不能提供这个对象的过期副本。缓存仍然可以提供新鲜的副本。如果缓存进行must-revalidate新鲜度是，源服务器不可用，缓存必须返回一条Gateway Timeout从错误。</p>
+<h2 id="缓存命中"><a href="#缓存命中" class="headerlink" title="缓存命中"></a>缓存命中</h2><p>缓存命中、未命中和再验证：<br><img src="http://www.processon.com/chart_image/597c0011e4b06e43d2d653b8.png" alt="HTTP Cache Hit"></p>
+<p>缓存命中率</p>
+<p>由缓存缓存提供服务的请求所占的比例成为称为缓存命中率(cache hit rate)。命中率在0到1之间，0表示缓存全部未命中，1表示缓存全部命中。缓存服务提供者希望缓存的命中是100%，而实际的缓存命中率与缓存大小，缓存内容变化，请求者兴趣相似度等因素相关。</p>
+<h2 id="缓存新鲜度"><a href="#缓存新鲜度" class="headerlink" title="缓存新鲜度"></a>缓存新鲜度</h2><h3 id="文档过期"><a href="#文档过期" class="headerlink" title="文档过期"></a>文档过期</h3><p>就像牛奶过期一样，文档也有过期时间。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 <span class="number">200</span> OK</div><div class="line"><span class="attribute">Content-Type</span>: text/plain</div><div class="line"><span class="attribute">Cache-Control</span>: max-age=484200</div></pre></td></tr></table></figure>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">HTTP/1.1 <span class="number">200</span> OK</div><div class="line"><span class="attribute">Content-Type</span>: text/plain</div><div class="line"><span class="attribute">Expires</span>: Fri, 05 Jul 2017, 12:00:00 GMT</div></pre></td></tr></table></figure>
+<p><code>Cache-Control: max-age=484200</code>是一个相对过期时间，max-age定义了文档的最大使用期，从第一次生成文档到文档不再新鲜为止，以秒为单位。</p>
+<p><code>Expires:Fri, 05 Jul 2017, 12:00:00 GMT</code>是一个绝对过期时间，如果过期时间已经过了，则文档不再新鲜。该首部要<strong>时钟同步</strong>。</p>
+<h3 id="服务器再验证"><a href="#服务器再验证" class="headerlink" title="服务器再验证"></a>服务器再验证</h3><p>缓存文档过期并不意味着该副本与服务器文档不一致，只是意味着要与源服务器进行再验证。</p>
+<ul>
+<li>如果再验证内容发生了变化，缓存获取新的副本，替换过期副本</li>
+<li>如果再验证内容没有发生变化，缓存只需要获取新的首部，对缓存的副本的首部进行更新</li>
+</ul>
+<p>条件再验证HTTP首部：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>If-Modify-Since: <date></date></td>
+<td>如果从指定日期之后文档被修改过了，就执行该请求。可以与Last-Modified服务器响应首部配合使用，只有在内容被修改后，才去获取新的内容</td>
+</tr>
+<tr>
+<td>If-None-Match: <tags></tags></td>
+<td>服务器可以为文档提供特殊的标签，而不是将其与最近修改时间相匹配，这些标签就像序列号一样</td>
+</tr>
+</tbody>
+</table>
+<p>If-Modify-Since: Date再验证:</p>
+<ul>
+<li>如果自指定日期后，文档被修改了，If-Modify-Since条件为真，源服务器会返回成功的响应，包含新的过期首部和新文档实体</li>
+<li>如果自指定日期后，文档未被修改，If-Modify-Since条件为假，源服务器会返回一个304 Not Modified的响应，不包含文档实体内容</li>
+</ul>
+<p><img src="http://www.processon.com/chart_image/597c3916e4b06e43d2d6618c.png" alt=""></p>
+<p>If-None-Match: Tags</p>
+<p>有些情况下，仅使用最后修改时间是不够的。</p>
+<ul>
+<li>文档被周期性的重写，最后修改时间发生变化，而内容未改变</li>
+<li>服务器无法判定最后修改时间</li>
+</ul>
+<p>HTTP允许用户对实体打标签，进行标识。</p>
+<p><img src="http://www.processon.com/chart_image/597c40b1e4b06b35d2fa3f2e.png" alt=""></p>
+<p>什么时候使用最后修改时间和标签验证？</p>
+<p>如果服务器返回了ETag首部，客户端必须使用标签验证。如果服务器只返回了Last-Modified首部，客户端可以使用最后修改时间验证。</p>
+<h3 id="新鲜度计算算法"><a href="#新鲜度计算算法" class="headerlink" title="新鲜度计算算法"></a>新鲜度计算算法</h3><p>为了分辨文档是否新鲜，需要计算两个值，文档的使用期(age)和文档的新鲜生存期(freshness lifetime)。如果文档使用期小于文档新鲜生存期，则文档是新鲜的。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">is_fresh_enough = <span class="keyword">True</span> <span class="keyword">if</span> age &lt; freshness_lifetime</div></pre></td></tr></table></figure>
+<h4 id="使用期"><a href="#使用期" class="headerlink" title="使用期"></a>使用期</h4><p>使用期包含了网络传输时间和文档在缓存的停留时间。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">apparent_time = time_got_response - date_header_value</div><div class="line">corrent_apparent_time = max(<span class="number">0</span>, apparent_time)</div><div class="line">age_when_document_arrived_at_our_cache = corrent_apparent_time</div><div class="line"></div><div class="line">how_long_copy_has_been_in_our_cache = current_time - got_response_time</div><div class="line"></div><div class="line">age = age_when_document_arrived_at_our_cache + how_long_copy_has_been_in_our_cache</div></pre></td></tr></table></figure>
+<p>基于Date首部计算apparent使用期</p>
+<p>apparen时间：</p>
+<p>apparent时间等于获得响应时间减去服务器发送文档时间：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apparent_time = time_got_response - date_header_value</div></pre></td></tr></table></figure>
+<p>为了防止由于服务器时间不同步导致apparent_time为负，进行时间修正：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apparent_time = max(<span class="number">0</span>, apparent_time)</div><div class="line">age_when_document_arrived_at_our_cache = apparent_time</div></pre></td></tr></table></figure>
+<p>对网络时延对补偿：</p>
+<p><strong>如果文档在网络或服务器中阻塞了很长时间，相对使用期的计算可能会极大的低估文档使用期。缓存知道文档请求时间，以及文档到达时间。HTTP/1.1会在这些网络延迟上加上整个网络时延，一遍对其进行保守校正。这个从缓存到服务器到缓存高估了服务器到缓存延迟，它是保守的。如果出错，只会使文档看起来比实际使用期要老，并会引发不必要的验证。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">response_delay_estimate = time_got_response - time_issued_request</div><div class="line">age_when_document_arrived_at_our_cache = apparent_time + response_delay_estimate</div></pre></td></tr></table></figure>
+<blockquote>
+<p>Note:该时延补偿会导致最后计算文档使用期大于实际的文档使用期。apparent_time是包含网络时延的，对网络时延补偿是否必要？在服务器负载较高，对服务器的处理时间进行补偿倒是很有必要。</p>
+</blockquote>
+<p>缓存停留时间：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">how_long_copy_has_been_in_our_cache = current_time - got_response_time</div></pre></td></tr></table></figure>
+<p><img src="http://www.processon.com/chart_image/597c52a3e4b06e43d2d66a4e.png" alt=""></p>
+<h4 id="新鲜生存期"><a href="#新鲜生存期" class="headerlink" title="新鲜生存期"></a>新鲜生存期</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">calculate_server_freshness_limit</span><span class="params">(**kwargs)</span>:</span></div><div class="line">	heuristic = <span class="keyword">False</span></div><div class="line">	server_freshness_limit = default_cache_min_lifetime</div><div class="line">    <span class="keyword">if</span> max_age_value_set:</div><div class="line">    	server_freshness_limit = max_age_value_set</div><div class="line">    <span class="keyword">elif</span> expires_value_set:</div><div class="line">   		server_freshness_limit = expires_value_set - date_value</div><div class="line">    <span class="keyword">elif</span> last_modified_value_set:</div><div class="line">    	time_since_last_modify = max(<span class="number">0</span>, date_value - last_modified_value)</div><div class="line">        server_freshness_limit = int(time_since_last_modify*lm_factor)</div><div class="line">        heuristic = <span class="keyword">True</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">    	server_freshness_limit = default_cache_min_lifetime</div><div class="line">        heuristic = <span class="keyword">True</span></div><div class="line"></div><div class="line">	<span class="keyword">if</span> heuristic:</div><div class="line">    	<span class="keyword">if</span> server_freshness_limit &gt; default_cache_max_lifetime:</div><div class="line">        	server_freshness_limit = default_cache_max_lifetime</div><div class="line">        <span class="keyword">if</span> server_freshness_limit &lt; default_cache_min_lifetime:</div><div class="line">        	server_freshness_limit = default_cache_min_lifetime</div><div class="line">            </div><div class="line">	<span class="keyword">return</span> server_freshness_limit</div></pre></td></tr></table></figure>
+<p>LM-factor算法计算新鲜周期</p>
+<ul>
+<li>如果已缓存文档最后一次修改发生在很久以前，它可能是一份稳定的文档，不会突然发生变化，因此将其汲取保存在缓存中比较安全</li>
+<li>如果已缓存的文档最近被修改过，就说明它很可能会频繁发生变化，因此在与服务器再验证之前，只应该将其缓存很短一段时间</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">time_since_modify = max(<span class="number">0</span>, date_value - server_last_modified)</div><div class="line">server_freshness_limit = time_since_modify * lm_factor</div></pre></td></tr></table></figure>
+<p><img src="http://www.processon.com/chart_image/597c9f3be4b06e43d2d6757c.png" alt=""></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>缓存相关的HTTP头部：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cache-Control</td>
+<td>缓存控制</td>
+</tr>
+<tr>
+<td>Expires</td>
+<td>过期绝对时间</td>
+</tr>
+<tr>
+<td>If-Modify-Since</td>
+<td>从某个时间开始文档是否发生改变</td>
+</tr>
+<tr>
+<td>If-None-Match</td>
+<td>文档的标签是否发生改变</td>
+</tr>
+<tr>
+<td>Last-Modified</td>
+<td>最后修改时间</td>
+</tr>
+<tr>
+<td>ETag</td>
+<td>文档标签</td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cache-Control</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Expires</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Last-Modified</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7234" target="_blank" rel="external">rfc7234  Hypertext Transfer Protocol (HTTP/1.1): Caching</a></li>
+<li><a href="HTTP Cache-Control Extensions for Stale Content">rfc5861 HTTP Cache-Control Extensions for Stale Content</a></li>
+<li><a href="https://www.mnot.net/cache_docs/" target="_blank" rel="external">Caching Tutorial</a></li>
+<li><a href="https://redbot.org/" target="_blank" rel="external">redbot</a>, a tool to check your cache-related HTTP headers.</li>
+<li><a href="https://www.ietf.org/rfc/rfc2616.txt" target="_blank" rel="external">Hypertext Transfer Protocol – HTTP/1.1</a></li>
+</ul>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://blog.hotbaby.org/2017/07/29/http-cache/" data-id="cj5pzob3t003k0wfs9n7yuc16" class="article-share-link">分享到</a><div class="tags"><a href="/tags/cache/">cache</a><a href="/tags/HTTP/">HTTP</a></div><div class="post-nav"><a href="/2017/07/19/untitled-1499683380864/" class="next">OAuth</a></div><div id="disqus_thread"><script>var disqus_shortname = 'hotbaby-1';
+var disqus_identifier = '2017/07/29/http-cache/';
+var disqus_title = 'HTTP Cache';
+var disqus_url = 'http://blog.hotbaby.org/2017/07/29/http-cache/';
+(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//hotbaby-1.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="http://blog.hotbaby.org"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/django/">django</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/旅行/">旅行</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Cobra/" style="font-size: 15px;">Cobra</a> <a href="/tags/Python/" style="font-size: 15px;">Python</a> <a href="/tags/django/" style="font-size: 15px;">django</a> <a href="/tags/Lisp/" style="font-size: 15px;">Lisp</a> <a href="/tags/Paul-Graham/" style="font-size: 15px;">Paul Graham</a> <a href="/tags/电影/" style="font-size: 15px;">电影</a> <a href="/tags/跑步/" style="font-size: 15px;">跑步</a> <a href="/tags/PEP/" style="font-size: 15px;">PEP</a> <a href="/tags/PyPI/" style="font-size: 15px;">PyPI</a> <a href="/tags/decorator/" style="font-size: 15px;">decorator</a> <a href="/tags/closure/" style="font-size: 15px;">closure</a> <a href="/tags/Flask/" style="font-size: 15px;">Flask</a> <a href="/tags/RSS/" style="font-size: 15px;">RSS</a> <a href="/tags/selenium/" style="font-size: 15px;">selenium</a> <a href="/tags/cache/" style="font-size: 15px;">cache</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/HTTP/" style="font-size: 15px;">HTTP</a> <a href="/tags/json/" style="font-size: 15px;">json</a> <a href="/tags/nginx/" style="font-size: 15px;">nginx</a> <a href="/tags/shadowsocks/" style="font-size: 15px;">shadowsocks</a> <a href="/tags/OAuth/" style="font-size: 15px;">OAuth</a> <a href="/tags/互联网/" style="font-size: 15px;">互联网</a> <a href="/tags/八达岭长城/" style="font-size: 15px;">八达岭长城</a> <a href="/tags/腾讯/" style="font-size: 15px;">腾讯</a> <a href="/tags/读书/" style="font-size: 15px;">读书</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/29/http-cache/">HTTP Cache</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/19/untitled-1499683380864/">OAuth</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/18/untitled-1500307428319/">Python Metaclass</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/10/Python-descriptor/">Python  Descriptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Selenium/">Selenium</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Python-context/">Python Context</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/09/Python-debug/">Python Debug</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/09/debian-timezone/">Debian Timezone</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/09/Python-customization/">Python Customization</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/08/Python-pip-mirror/">Python PyPI Mirror</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://paulgraham.com/" title="Paul Graham" target="_blank">Paul Graham</a><ul></ul><a href="http://babywolfh.win" title="babywolfh's blog" target="_blank">babywolfh's blog</a><ul></ul><a href="https://www.haomwei.com/" title="9441's blog" target="_blank">9441's blog</a><ul></ul><a href="https://www.biaodianfu.com/" title="标点符" target="_blank">标点符</a><ul></ul><a href="https://docs.python.org/2/" title="Python 2.7.12 Documentation" target="_blank">Python 2.7.12 Documentation</a><ul></ul><a href="http://aosabook.org/en/index.html" title="The Architecture of Open Source Applications" target="_blank">The Architecture of Open Source Applications</a><ul></ul><a href="http://www.pycon.org/" title="Python Community" target="_blank">Python Community</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">© 2017 <a href="/." rel="nofollow">hotbaby</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="/css/jquery.fancybox.css?v=0.0.0"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?bf8f991bdc9a9dc0e9009de94acefaf6";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+  })();
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
