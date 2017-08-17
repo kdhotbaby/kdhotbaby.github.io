@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-08-15T23:34:21.000Z</updated>
+  <updated>2017-08-16T16:14:50.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -17,24 +17,24 @@
   
   <entry>
     <title>Python社区</title>
-    <link href="http://blog.hotbaby.org/2017/08/15/untitled-1502839363376/"/>
-    <id>http://blog.hotbaby.org/2017/08/15/untitled-1502839363376/</id>
-    <published>2017-08-15T23:34:21.000Z</published>
-    <updated>2017-08-15T23:34:21.000Z</updated>
+    <link href="http://blog.hotbaby.org/2017/08/16/untitled-1502839363376/"/>
+    <id>http://blog.hotbaby.org/2017/08/16/untitled-1502839363376/</id>
+    <published>2017-08-16T16:14:50.000Z</published>
+    <updated>2017-08-16T16:14:50.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
-<li><a href="https://python.freelycode.com" target="_blank" rel="external">Python部落</a></li>
-<li><a href="https://www.douban.com/group/python/" target="_blank" rel="external">Python编程小组</a></li>
-<li><a href="https://stackoverflow.com/questions/tagged/python" target="_blank" rel="external">Python stack overflow</a></li>
 <li><a href="https://zhuanlan.zhihu.com/zimei" target="_blank" rel="external">Python中文社区-知乎专栏</a></li>
+<li><a href="https://stackoverflow.com/questions/tagged/python" target="_blank" rel="external">Python stack overflow</a></li>
+<li><a href="https://python.freelycode.com" target="_blank" rel="external">Python部落</a></li>
+<li><a href="https://www.douban.com/group/python/" target="_blank" rel="external">Python豆瓣编程小组</a></li>
 </ul>
 ]]></content>
     
     <summary type="html">
     
       &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://python.freelycode.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Python部落&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://www.douban.com/group/
+&lt;li&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/zimei&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Python中文社区-知乎专栏&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://stackoverfl
     
     </summary>
     
