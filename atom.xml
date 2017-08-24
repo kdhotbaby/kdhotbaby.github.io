@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-08-21T23:24:59.000Z</updated>
+  <updated>2017-08-23T01:41:33.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,47 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python资源</title>
+    <link href="http://blog.hotbaby.org/2017/08/23/untitled-1503452426877/"/>
+    <id>http://blog.hotbaby.org/2017/08/23/untitled-1503452426877/</id>
+    <published>2017-08-23T01:40:26.000Z</published>
+    <updated>2017-08-23T01:41:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li><a href="https://docs.python.org/2/" target="_blank" rel="external">Python 2.7.13 documentation</a></li>
+<li><a href="http://flask.pocoo.org/" target="_blank" rel="external">Flask</a></li>
+<li><a href="http://api.mongodb.com/python/current/index.html" target="_blank" rel="external">PyMongo</a></li>
+<li><a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/" target="_blank" rel="external">Virtual environments</a></li>
+<li><a href="http://mengyangyang.org/scrapy/" target="_blank" rel="external">Scrapy documentation</a></li>
+<li><a href="https://python-packaging.readthedocs.io/en/latest/" target="_blank" rel="external">Python pakaging</a></li>
+<li><a href="https://github.com/benediktschmitt/py-jsonapi" target="_blank" rel="external">py-jsonapi</a></li>
+<li><a href="http://flask-rest-jsonapi.readthedocs.io/en/latest/" target="_blank" rel="external">flask-rest-jsonapi</a></li>
+<li><a href="https://github.com/socialwifi/jsonapi-requests/" target="_blank" rel="external">jsonapi-requests</a></li>
+<li><a href="https://pip.readthedocs.io/en/1.1/requirements.html" target="_blank" rel="external">requirements</a></li>
+<li><a href="http://nose.readthedocs.io/en/latest/" target="_blank" rel="external">nose</a></li>
+<li><a href="https://flask-oauthlib.readthedocs.io/en/latest/" target="_blank" rel="external">flask-oauthlib</a></li>
+<li><a href="http://www.django-rest-framework.org/" target="_blank" rel="external">django rest framework website</a></li>
+<li><a href="https://github.com/encode/django-rest-framework" target="_blank" rel="external">django rest framework GitHub</a></li>
+<li><a href="https://pythonhosted.org/blinker/" target="_blank" rel="external">blinker</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://docs.python.org/2/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Python 2.7.13 documentation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://flask.
+    
+    </summary>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL</title>
@@ -64,7 +105,7 @@
     <link href="http://blog.hotbaby.org/2017/08/16/untitled-1502839363376/"/>
     <id>http://blog.hotbaby.org/2017/08/16/untitled-1502839363376/</id>
     <published>2017-08-16T16:14:50.000Z</published>
-    <updated>2017-08-16T16:14:50.000Z</updated>
+    <updated>2017-08-23T01:42:05.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li><a href="https://zhuanlan.zhihu.com/zimei" target="_blank" rel="external">Python中文社区-知乎专栏</a></li>
@@ -81,6 +122,8 @@
 &lt;li&gt;&lt;a href=&quot;https://stackoverfl
     
     </summary>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
     
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
@@ -517,7 +560,7 @@
     <link href="http://blog.hotbaby.org/2017/07/18/untitled-1500307428319/"/>
     <id>http://blog.hotbaby.org/2017/07/18/untitled-1500307428319/</id>
     <published>2017-07-18T14:57:26.000Z</published>
-    <updated>2017-07-18T14:57:26.000Z</updated>
+    <updated>2017-08-23T01:42:24.000Z</updated>
     
     <content type="html"><![CDATA[<p><em>[Metaclasses] are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you don’t (the people who actually need them know with certainty that they need them, and don’t need an explanation about why).</em> The Python core developer Time Peters said.</p>
 <p>元类是创建类的类。新风格(new-style)类是type类的实例。元类是type类的派生类，通过重载type类的<code>__new__</code>和<code>__init__</code>方法，重新定义类创建协议，来实现类创建的定制化。</p>
@@ -581,6 +624,8 @@
     
     </summary>
     
+      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
+    
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
     
@@ -591,7 +636,7 @@
     <link href="http://blog.hotbaby.org/2017/07/10/Python-descriptor/"/>
     <id>http://blog.hotbaby.org/2017/07/10/Python-descriptor/</id>
     <published>2017-07-10T15:58:38.000Z</published>
-    <updated>2017-07-21T09:19:40.000Z</updated>
+    <updated>2017-08-23T01:42:37.000Z</updated>
     
     <content type="html"><![CDATA[<p>如果一个对象定义了以下任意方法，这个对象就是一个描述符。给描述符下个定义，描述符就是绑定了行为属性的对象。</p>
 <p><code>object.__get__(self, instance, owner)</code></p>
@@ -626,6 +671,8 @@
 &lt;p&gt;&lt;code&gt;object.__set
     
     </summary>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
     
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
@@ -818,7 +865,7 @@
     <link href="http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/"/>
     <id>http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/</id>
     <published>2017-06-08T06:22:00.000Z</published>
-    <updated>2017-07-21T09:35:42.000Z</updated>
+    <updated>2017-08-23T01:43:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>PyPI(Python Package Index)是Python软件仓库。</p>
 <p>pip是Python包管理工具，默认使用<code>pypi.python.org</code>作为PyPI的镜像。</p>
@@ -863,6 +910,8 @@
 &lt;p&gt;pip安装Python软件包经常会出现”链接pyp
     
     </summary>
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
     
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
@@ -1167,35 +1216,6 @@
     
     
       <category term="shadowsocks" scheme="http://blog.hotbaby.org/tags/shadowsocks/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>McFarland</title>
-    <link href="http://blog.hotbaby.org/2017/05/01/McFarland/"/>
-    <id>http://blog.hotbaby.org/2017/05/01/McFarland/</id>
-    <published>2017-05-01T15:37:00.000Z</published>
-    <updated>2017-08-09T00:59:33.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>McFarland movie lines.</p>
-<p>We fly like black birds through the orange groves.</p>
-<p>When we run, we own the earth. The land is ours, we speak the birds’s language. Not immigrants no more, Not stupid Mexicans.</p>
-<p>When we run, our spirits fly. We speak to the gods.</p>
-<p>When we run, we are the gods.</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;McFarland movie lines.&lt;/p&gt;
-&lt;p&gt;We fly like black birds through the orange groves.&lt;/p&gt;
-&lt;p&gt;When we run, we own the earth. The land is ours, 
-    
-    </summary>
-    
-    
-      <category term="电影" scheme="http://blog.hotbaby.org/tags/%E7%94%B5%E5%BD%B1/"/>
-    
-      <category term="跑步" scheme="http://blog.hotbaby.org/tags/%E8%B7%91%E6%AD%A5/"/>
     
   </entry>
   
