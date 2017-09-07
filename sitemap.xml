@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.hotbaby.org/2017/04/19/git/</loc>
+    
+    <lastmod>2017-09-06T06:41:42.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.hotbaby.org/2017/08/21/untitled-1501583914843/</loc>
     
     <lastmod>2017-09-04T03:23:19.000Z</lastmod>
@@ -191,13 +198,6 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/04/19/git/</loc>
-    
-    <lastmod>2017-06-26T01:32:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://blog.hotbaby.org/2017/06/01/Lisp/</loc>
     
     <lastmod>2017-06-02T04:19:00.000Z</lastmod>
@@ -261,14 +261,14 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/history/index.html</loc>
+    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/09/%E6%88%91%E5%9C%A8%E5%B9%B3%E9%81%A5%E7%AD%89%E4%BD%A0/</loc>
+    <loc>http://blog.hotbaby.org/history/index.html</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
@@ -282,7 +282,7 @@
   </url>
   
   <url>
-    <loc>http://blog.hotbaby.org/2017/03/13/%E5%85%AB%E8%BE%BE%E5%B2%AD%E9%95%BF%E5%9F%8E/</loc>
+    <loc>http://blog.hotbaby.org/2017/03/09/%E6%88%91%E5%9C%A8%E5%B9%B3%E9%81%A5%E7%AD%89%E4%BD%A0/</loc>
     
     <lastmod>2017-05-06T03:38:16.000Z</lastmod>
     
