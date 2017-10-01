@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-09-16T08:16:15.000Z</updated>
+  <updated>2017-09-30T01:41:15.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>12 Factor</title>
+    <link href="http://blog.hotbaby.org/2017/09/30/untitled-1506735628892/"/>
+    <id>http://blog.hotbaby.org/2017/09/30/untitled-1506735628892/</id>
+    <published>2017-09-30T01:41:03.000Z</published>
+    <updated>2017-09-30T01:41:15.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://12factor.net/" target="_blank" rel="external">12factor</a></li>
+<li><a href="https://12factor.net/zh_cn/" target="_blank" rel="external">12factor中文版</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;参考&quot;&gt;&lt;a href=&quot;#参考&quot; class=&quot;headerlink&quot; title=&quot;参考&quot;&gt;&lt;/a&gt;参考&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://12factor.net/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;1
+    
+    </summary>
+    
+    
+      <category term="12factor" scheme="http://blog.hotbaby.org/tags/12factor/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL</title>
@@ -1174,58 +1199,6 @@
     
     
       <category term="nginx" scheme="http://blog.hotbaby.org/tags/nginx/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Shadowsocks</title>
-    <link href="http://blog.hotbaby.org/2017/05/08/shadowsocks/"/>
-    <id>http://blog.hotbaby.org/2017/05/08/shadowsocks/</id>
-    <published>2017-05-08T00:07:00.000Z</published>
-    <updated>2017-05-10T16:51:42.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>shadowsocks  科学上网解决方案</p>
-<h2 id="Shadowsocks-Server"><a href="#Shadowsocks-Server" class="headerlink" title="Shadowsocks Server"></a>Shadowsocks Server</h2><h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><p><code>pip install shadowsocks==2.1.0</code></p>
-<h3 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h3><p><code>cat /etc/shadowsocks/config.json</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;server&quot;:&quot;ip address&quot;,</div><div class="line">    &quot;server_port&quot;:8388,</div><div class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</div><div class="line">    &quot;local_port&quot;:1080,</div><div class="line">    &quot;password&quot;:&quot;password&quot;,</div><div class="line">    &quot;timeout&quot;:300,</div><div class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</div><div class="line">    &quot;fast_open&quot;: false,</div><div class="line">    &quot;workers&quot;: 1</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h3><p><code>/usr/bin/ssserver -c /etc/shadowsocks/config.json</code></p>
-<h3 id="Boot-Script"><a href="#Boot-Script" class="headerlink" title="Boot Script"></a>Boot Script</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">#! /bin/sh</div><div class="line"></div><div class="line">set -e</div><div class="line">PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin</div><div class="line">DESC=&quot;shadowsocks daemon&quot;</div><div class="line">NAME=shadowsocks</div><div class="line">DAEMON=/usr/bin/ssserver</div><div class="line">SCRIPTNAME=/etc/init.d/shadowsocks</div><div class="line"></div><div class="line"># If the daemon file is not found, terminate the script.</div><div class="line">test -x $DAEMON || exit 0</div><div class="line"></div><div class="line">d_start() &#123;</div><div class="line">  $DAEMON -c /etc/shadowsocks/config.json &gt;&gt; /var/log/shadowsocks.log 2&gt;&amp;1 &amp; </div><div class="line">  echo -n &quot; already running&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">d_stop() &#123;</div><div class="line">  killall ssserver || echo -n &quot; not running&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line">case &quot;$1&quot; in</div><div class="line">  start)</div><div class="line">    echo -n &quot;Starting $DESC: $NAME&quot;</div><div class="line">    d_start</div><div class="line">    echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  stop)</div><div class="line">    echo -n &quot;Stopping $DESC: $NAME&quot;</div><div class="line">    d_stop</div><div class="line">    echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  restart)</div><div class="line">  echo -n &quot;Restarting $DESC: $NAME&quot;</div><div class="line">  d_stop</div><div class="line"># Sleep for two seconds before starting again, this should give the</div><div class="line"># Nginx daemon some time to perform a graceful stop.</div><div class="line">  sleep 2</div><div class="line">  d_start</div><div class="line">  echo &quot;.&quot;</div><div class="line">  ;;</div><div class="line">  *)</div><div class="line">  echo &quot;Usage: $SCRIPTNAME &#123;start|stop|restart&#125;&quot; &gt;&amp;2</div><div class="line">  exit 3</div><div class="line">  ;;</div><div class="line">esac</div><div class="line">exit 0</div></pre></td></tr></table></figure>
-<p>done</p>
-<h2 id="Shadowsocks-Client"><a href="#Shadowsocks-Client" class="headerlink" title="Shadowsocks Client"></a>Shadowsocks Client</h2><h3 id="Linux-Client"><a href="#Linux-Client" class="headerlink" title="Linux Client"></a>Linux Client</h3><p><strong>download shadowsocks linux client</strong></p>
-<p><a href="https://jaist.dl.sourceforge.net/project/shadowsocksgui/dist/shadowsocks-gui-0.6.4-linux-x64.tar.xz" target="_blank" rel="external">shadowsocks download</a></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">tar xvf shadowsocks-gui*.tar.gz</div><div class="line">mv shadowsocks-gui /opt/shadowsocks/</div></pre></td></tr></table></figure>
-<p><strong>config linux application</strong></p>
-<p><code>/usr/share/applications/shadowsocks.desktop</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[Desktop Entry]</div><div class="line">Version=1.0</div><div class="line">Name=shadowsocks</div><div class="line">Exec=/opt/shadowsocks/start.sh</div><div class="line">Terminal=false</div><div class="line">#Icon=/opt/eclipse/icon.xpm</div><div class="line">Type=Application</div><div class="line">Categories=Development</div></pre></td></tr></table></figure>
-<p><strong>run</strong></p>
-<p>搜索 shadowsocks, 点击运行</p>
-<h3 id="Android-Client"><a href="#Android-Client" class="headerlink" title="Android Client"></a>Android Client</h3><p>直接下载apk安装、配置即可。</p>
-<h3 id="Terminal"><a href="#Terminal" class="headerlink" title="Terminal"></a>Terminal</h3><p>安装polipo</p>
-<p><code>sudo apt-get install polipo</code></p>
-<p>配置polipo</p>
-<p><code>/etc/polipo/config</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">socksParentProxy = &quot;127.0.0.1:1080&quot;</div><div class="line">socksProxyType = socks5</div><div class="line"></div><div class="line">logSyslog = true</div><div class="line">logFile = /var/log/polipo/polipo.log</div></pre></td></tr></table></figure>
-<p>启动polipo</p>
-<p><code>sudo polipo</code></p>
-<p>配置终端代理</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> http_proxy=127.0.0.1:8123</div><div class="line"><span class="built_in">export</span> https_proxy=127.0.0.1:8123</div></pre></td></tr></table></figure>
-<p>验证代理<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://www.google.com/</div></pre></td></tr></table></figure></p>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
-<li><a href="https://github.com/shadowsocks/shadowsocks/wiki" target="_blank" rel="external">shadowsocks wiki</a></li>
-<li><a href="https://github.com/shadowsocks/shadowsocks-android/releases" target="_blank" rel="external">shadowsocks android application</a></li>
-<li><a href="https://jaist.dl.sourceforge.net/project/shadowsocksgui/dist/shadowsocks-gui-0.6.4-linux-x64.tar.xz" target="_blank" rel="external">shadowsocks linux client</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;shadowsocks  科学上网解决方案&lt;/p&gt;
-&lt;h2 id=&quot;Shadowsocks-Server&quot;&gt;&lt;a href=&quot;#Shadowsocks-Server&quot; class=&quot;headerlink&quot; title=&quot;Shadowsocks Server&quot;&gt;&lt;/a&gt;Sha
-    
-    </summary>
-    
-    
-      <category term="shadowsocks" scheme="http://blog.hotbaby.org/tags/shadowsocks/"/>
     
   </entry>
   
