@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-10-18T01:22:55.000Z</updated>
+  <updated>2017-10-23T08:55:42.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,143 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Django条件查询</title>
+    <link href="http://blog.hotbaby.org/2017/10/23/Django-db/"/>
+    <id>http://blog.hotbaby.org/2017/10/23/Django-db/</id>
+    <published>2017-10-23T08:50:07.000Z</published>
+    <updated>2017-10-23T08:55:42.000Z</updated>
+    
+    <content type="html"><![CDATA[<table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>__exact</td>
+<td>精确等于 like ‘aaa’</td>
+</tr>
+<tr>
+<td>__iexact</td>
+<td>精确等于 忽略大小写 ilike ‘aaa’</td>
+</tr>
+<tr>
+<td>__contains</td>
+<td>包含 like ‘%aaa%’</td>
+</tr>
+<tr>
+<td>__icontains</td>
+<td>包含 忽略大小写 ilike ‘%aaa%’，但是对于sqlite来说，contains的作用效果等同于icontains。</td>
+</tr>
+<tr>
+<td>__gt</td>
+<td>大于</td>
+</tr>
+<tr>
+<td>__gte</td>
+<td>大于等于</td>
+</tr>
+<tr>
+<td>__lt</td>
+<td>小于</td>
+</tr>
+<tr>
+<td>__lte</td>
+<td>小于等于</td>
+</tr>
+<tr>
+<td>__in</td>
+<td>存在于一个list范围内</td>
+</tr>
+<tr>
+<td>__startswith</td>
+<td>以…开头</td>
+</tr>
+<tr>
+<td>__istartswith</td>
+<td>以…开头 忽略大小写</td>
+</tr>
+<tr>
+<td>__endswith</td>
+<td>以…结尾</td>
+</tr>
+<tr>
+<td>__iendswith</td>
+<td>以…结尾，忽略大小写</td>
+</tr>
+<tr>
+<td>__range</td>
+<td>在…范围内</td>
+</tr>
+<tr>
+<td>__year</td>
+<td>日期字段的年份</td>
+</tr>
+<tr>
+<td>__month</td>
+<td>日期字段的月份</td>
+</tr>
+<tr>
+<td>__day</td>
+<td>日期字段的日</td>
+</tr>
+</tbody>
+</table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.douban.com/note/301166150/" target="_blank" rel="external">https://www.douban.com/note/301166150/</a></li>
+<li><a href="http://www.cnblogs.com/kidstudy/archive/2009/11/23/1608452.html" target="_blank" rel="external">http://www.cnblogs.com/kidstudy/archive/2009/11/23/1608452.html</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;操作符&lt;/th&gt;
+&lt;th&gt;含义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;__exact&lt;/td&gt;
+&lt;td&gt;精确等于 like ‘aaa’&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;__iexact&lt;
+    
+    </summary>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Django Model Field Choices</title>
+    <link href="http://blog.hotbaby.org/2017/10/23/untitled-1508722254450/"/>
+    <id>http://blog.hotbaby.org/2017/10/23/untitled-1508722254450/</id>
+    <published>2017-10-23T01:30:54.000Z</published>
+    <updated>2017-10-23T01:44:25.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>如何将枚举转化成Django model field choices.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># encoding: utf-8</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> inspect</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ChoiceEnumMixin</span><span class="params">(object)</span>:</span></div><div class="line"><span class="meta">    @classmethod</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">choices</span><span class="params">(cls)</span>:</span></div><div class="line">        members = inspect.getmembers(cls,)</div><div class="line">        members = filter(<span class="keyword">lambda</span> m: <span class="keyword">not</span> (m[<span class="number">0</span>].startswith(<span class="string">'__'</span>) <span class="keyword">or</span> inspect.isroutine(m[<span class="number">1</span>])), members)</div><div class="line">        members = [tuple([m[<span class="number">1</span>], m[<span class="number">0</span>]]) <span class="keyword">for</span> m <span class="keyword">in</span> members]</div><div class="line">        <span class="keyword">return</span> tuple(members)</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">StatusEnum</span><span class="params">(ChoiceEnumMixin, object)</span>:</span></div><div class="line">    PENDING = <span class="number">1</span></div><div class="line">    DOING = <span class="number">2</span></div><div class="line">    SUCCESS = <span class="number">3</span></div><div class="line">    FAILURE = <span class="number">4</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    print(StatusEnum.choices())</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;如何将枚举转化成Django model field choices.&lt;/p&gt;
+&lt;figure class=&quot;highlight py&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div cla
+    
+    </summary>
+    
+    
+      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
+    
+  </entry>
   
   <entry>
     <title>当我跑步时，我在谈些什么</title>
@@ -1096,90 +1233,6 @@
     
       &lt;p&gt;WSGI(Web Server Gateway Interface) Web服务网关接口。&lt;/p&gt;
 &lt;p&gt;WSGI的目的替代CGI。CGI进程（类似Python解释器）针对每个请求进行创建，完成请求后退出。如果应程序接收树钱个请求，创建大量的语言解释器进程就会很快导致服务器
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>JSON Resources</title>
-    <link href="http://blog.hotbaby.org/2017/05/16/json-protocols/"/>
-    <id>http://blog.hotbaby.org/2017/05/16/json-protocols/</id>
-    <published>2017-05-16T01:58:00.000Z</published>
-    <updated>2017-07-21T09:36:05.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>JSNO-RPC</strong></p>
-<p>A light weight remote procedure call protocol.</p>
-<p><strong>SJON API</strong></p>
-<p>A specification for building API in JSON.</p>
-<p><strong>JSONBIN</strong></p>
-<p>JSONbin.io is a simple JSON storage service for free.</p>
-<p><strong>jq</strong></p>
-<p>jq is a light-weight and flexible command-line JSON processor.</p>
-<p><strong>References</strong></p>
-<ul>
-<li><a href="http://www.jsonrpc.org/" target="_blank" rel="external">JSON-RPC</a></li>
-<li><a href="https://stedolan.github.io/jq/" target="_blank" rel="external">jq</a></li>
-<li><a href="https://jsonbin.io/" target="_blank" rel="external">jsonbin</a></li>
-<li><a href="http://jsonapi.org/" target="_blank" rel="external">jsonapi</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;JSNO-RPC&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;A light weight remote procedure call protocol.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;SJON API&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;A specification f
-    
-    </summary>
-    
-    
-      <category term="json" scheme="http://blog.hotbaby.org/tags/json/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Flask Signal</title>
-    <link href="http://blog.hotbaby.org/2017/05/14/Flask-signal/"/>
-    <id>http://blog.hotbaby.org/2017/05/14/Flask-signal/</id>
-    <published>2017-05-14T08:50:08.000Z</published>
-    <updated>2017-07-21T09:23:21.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Flask signals 默认没有自己实现signal，而是使用blink进行信号的定义，连接，分发。</p>
-<h2 id="Flask-singal"><a href="#Flask-singal" class="headerlink" title="Flask singal"></a>Flask singal</h2><p>flask未实现自己信号处理,而是使用blink.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">signals_available = <span class="keyword">False</span></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">from</span> blinker <span class="keyword">import</span> Namespace</div><div class="line">    signals_available = <span class="keyword">True</span></div><div class="line"><span class="keyword">except</span> ImportError:</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Namespace</span><span class="params">(object)</span>:</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">signal</span><span class="params">(self, name, doc=None)</span>:</span></div><div class="line">            <span class="keyword">return</span> _FakeSignal(name, doc)</div></pre></td></tr></table></figure>
-<p>flask 支持的信号 </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">_signals = Namespace()</div><div class="line"></div><div class="line"><span class="comment"># Core signals.  For usage examples grep the source code or consult</span></div><div class="line"><span class="comment"># the API documentation in docs/api.rst as well as docs/signals.rst</span></div><div class="line">template_rendered = _signals.signal(<span class="string">'template-rendered'</span>)</div><div class="line">before_render_template = _signals.signal(<span class="string">'before-render-template'</span>)</div><div class="line">request_started = _signals.signal(<span class="string">'request-started'</span>)</div><div class="line">request_finished = _signals.signal(<span class="string">'request-finished'</span>)</div><div class="line">request_tearing_down = _signals.signal(<span class="string">'request-tearing-down'</span>)</div><div class="line">got_request_exception = _signals.signal(<span class="string">'got-request-exception'</span>)</div><div class="line">appcontext_tearing_down = _signals.signal(<span class="string">'appcontext-tearing-down'</span>)</div><div class="line">appcontext_pushed = _signals.signal(<span class="string">'appcontext-pushed'</span>)</div><div class="line">appcontext_popped = _signals.signal(<span class="string">'appcontext-popped'</span>)</div><div class="line">message_flashed = _signals.signal(<span class="string">'message-flashed'</span>)</div></pre></td></tr></table></figure>
-<h2 id="Blinker-signal"><a href="#Blinker-signal" class="headerlink" title="Blinker signal"></a>Blinker signal</h2><p>blinker支持的特性:</p>
-<ul>
-<li>a global registry of named signals</li>
-<li>anonymous signals</li>
-<li>custom name registries</li>
-<li>permanently or temporarily connected receivers</li>
-<li>automically disconnected receivers via weak referencing</li>
-<li>sending arbirary data payloads</li>
-<li>collecting return values from signal receivers</li>
-<li>thread safety</li>
-</ul>
-<h3 id="Blinker-signal-sample"><a href="#Blinker-signal-sample" class="headerlink" title="Blinker signal sample"></a>Blinker signal sample</h3><p>TODO</p>
-<h3 id="Blinker-signal-realization"><a href="#Blinker-signal-realization" class="headerlink" title="Blinker signal realization"></a>Blinker signal realization</h3><p>TODO </p>
-<p>注册</p>
-<p>弱引用</p>
-<p>线程安全</p>
-<h2 id="Problems"><a href="#Problems" class="headerlink" title="Problems"></a>Problems</h2><p>connecter weak reference</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">register_signal_handlers</span><span class="params">(app)</span>:</span></div><div class="line">   <span class="keyword">import</span> logging</div><div class="line">   <span class="keyword">from</span> flask.signals <span class="keyword">import</span> request_finished</div><div class="line">   _logger = logging.getLogger(<span class="string">'api.debug'</span>)</div><div class="line">   </div><div class="line">   <span class="function"><span class="keyword">def</span> <span class="title">log_response</span><span class="params">(sender, response, **options)</span>:</span></div><div class="line">       print(response)</div><div class="line">   request_finished.connect(log_response, app)</div></pre></td></tr></table></figure>
-<p>以上代码，不能按原意正确的运行。因为log_response是局部作用域函数，在函数调用完成后，该作用域会消失，因此不能正确的调用<code>log_response</code>函数。</p>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
-<li><a href="https://pythonhosted.org/blinker/" target="_blank" rel="external">https://pythonhosted.org/blinker/</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Flask signals 默认没有自己实现signal，而是使用blink进行信号的定义，连接，分发。&lt;/p&gt;
-&lt;h2 id=&quot;Flask-singal&quot;&gt;&lt;a href=&quot;#Flask-singal&quot; class=&quot;headerlink&quot; title=&quot;Flask si
     
     </summary>
     
