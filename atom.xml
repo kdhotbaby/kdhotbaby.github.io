@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-10-24T01:08:56.000Z</updated>
+  <updated>2017-10-28T16:37:45.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,34 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>node js</title>
+    <link href="http://blog.hotbaby.org/2017/10/28/untitled-1505555926262/"/>
+    <id>http://blog.hotbaby.org/2017/10/28/untitled-1505555926262/</id>
+    <published>2017-10-28T16:37:45.000Z</published>
+    <updated>2017-10-28T16:37:45.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>安装nodejs</p>
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl <span class="_">-s</span>L https://deb.nodesource.com/setup_6.x | sudo -E bash -</div><div class="line">sudo apt-get install -y nodejs</div></pre></td></tr></table></figure>
+<h3 id="Mac-OSX"><a href="#Mac-OSX" class="headerlink" title="Mac OSX"></a>Mac OSX</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl <span class="string">"https://nodejs.org/dist/latest/node-<span class="variable">$&#123;VERSION:-$(wget -qO- https://nodejs.org/dist/latest/ | sed -nE 's|.*&gt;node-(.*)\.pkg&lt;/a&gt;.*|\1|p')&#125;</span>.pkg"</span> &gt; <span class="string">"<span class="variable">$HOME</span>/Downloads/node-latest.pkg"</span> &amp;&amp; sudo installer -store -pkg <span class="string">"<span class="variable">$HOME</span>/Downloads/node-latest.pkg"</span> -target <span class="string">"/"</span></div><div class="line"></div><div class="line">brew install node</div></pre></td></tr></table></figure>
+<p>参考：</p>
+<ul>
+<li><a href="https://nodejs.org/en/download/package-manager/" target="_blank" rel="external">https://nodejs.org/en/download/package-manager/</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;安装nodejs&lt;/p&gt;
+&lt;h3 id=&quot;Linux&quot;&gt;&lt;a href=&quot;#Linux&quot; class=&quot;headerlink&quot; title=&quot;Linux&quot;&gt;&lt;/a&gt;Linux&lt;/h3&gt;&lt;figure class=&quot;highlight sh&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td c
+    
+    </summary>
+    
+    
+      <category term="nodejs" scheme="http://blog.hotbaby.org/tags/nodejs/"/>
+    
+  </entry>
   
   <entry>
     <title>旅行 写作 编程</title>
@@ -1204,45 +1232,6 @@
       <category term="Lisp" scheme="http://blog.hotbaby.org/tags/Lisp/"/>
     
       <category term="Paul Graham" scheme="http://blog.hotbaby.org/tags/Paul-Graham/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Django Database Router</title>
-    <link href="http://blog.hotbaby.org/2017/05/17/django-db-router/"/>
-    <id>http://blog.hotbaby.org/2017/05/17/django-db-router/</id>
-    <published>2017-05-17T11:56:00.000Z</published>
-    <updated>2017-07-21T09:21:25.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>django ORM数据模型配置数据库．</p>
-<p>django支持多个数据库，通过django ORM定义数据模型，比如<code>class User(Model)</code>，无法通过<code>class Meta</code>配置管理该数据模型对应的数据库，只能使用默认数据库<code>default</code>．</p>
-<p>django <code>ConnectionRouter</code>解决数据模型与数据库映射．</p>
-<p><strong>实现DB router</strong></p>
-<p><code>db_router.py</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> logging</div><div class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</div><div class="line"></div><div class="line">_logger = logging.getLogger(<span class="string">'django'</span>)</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">DatabaseRouter</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Database router to control the  models for differrent db.</div><div class="line">    """</div><div class="line"></div><div class="line">    DEFAULT_DB = <span class="string">'default'</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_db</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        db = getattr(model, <span class="string">'_database'</span>, <span class="keyword">None</span>)</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> db:</div><div class="line">            <span class="keyword">return</span> self.DEFAULT_DB</div><div class="line"></div><div class="line">        <span class="keyword">if</span> db <span class="keyword">in</span> settings.DATABASES.keys():</div><div class="line">            <span class="keyword">return</span> db</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            _logger.warn(<span class="string">'%s not exist'</span> % db)</div><div class="line">            <span class="keyword">return</span> self.DEFAULT_DB</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_read</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._db(model, **hints)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_write</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">        <span class="keyword">return</span> self._db(model, **hints)</div></pre></td></tr></table></figure>
-<p><strong>配置DB routers</strong></p>
-<p><code>DATABASE_ROUTERS = [&#39;db_router.DatabaseRouter&#39;]</code></p>
-<p><strong>为Model制定数据库</strong></p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class User(Model)</div><div class="line">	_database = 'user_db'</div><div class="line">    class  Meta:</div><div class="line">    	db_table = 'user'</div><div class="line">    ...</div></pre></td></tr></table></figure>
-<p><strong>实现原理</strong></p>
-<p>django通过<code>ConnectionRouter</code>管理数据库路由</p>
-<p><code>django/db/utils.py</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConnectionRouter</span><span class="params">(object)</span>:</span></div><div class="line"></div><div class="line"><span class="meta">    @cached_property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">routers</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> self._routers <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            self._routers = settings.DATABASE_ROUTERS</div><div class="line">        routers = []</div><div class="line">        <span class="keyword">for</span> r <span class="keyword">in</span> self._routers:</div><div class="line">            <span class="keyword">if</span> isinstance(r, six.string_types):</div><div class="line">                router = import_string(r)()</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                router = r</div><div class="line">            routers.append(router)</div><div class="line">        <span class="keyword">return</span> routers</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_router_func</span><span class="params">(action)</span>:</span></div><div class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_route_db</span><span class="params">(self, model, **hints)</span>:</span></div><div class="line">            chosen_db = <span class="keyword">None</span></div><div class="line">            <span class="keyword">for</span> router <span class="keyword">in</span> self.routers:</div><div class="line">                <span class="keyword">try</span>:</div><div class="line">                    method = getattr(router, action)</div><div class="line">                <span class="keyword">except</span> AttributeError:</div><div class="line">                    <span class="comment"># If the router doesn't have a method, skip to the next one.</span></div><div class="line">                    <span class="keyword">pass</span></div><div class="line">                <span class="keyword">else</span>:</div><div class="line">                    chosen_db = method(model, **hints)</div><div class="line">                    <span class="keyword">if</span> chosen_db:</div><div class="line">                        <span class="keyword">return</span> chosen_db</div><div class="line">            instance = hints.get(<span class="string">'instance'</span>)</div><div class="line">            <span class="keyword">if</span> instance <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span> <span class="keyword">and</span> instance._state.db:</div><div class="line">                <span class="keyword">return</span> instance._state.db</div><div class="line">            <span class="keyword">return</span> DEFAULT_DB_ALIAS</div><div class="line">        <span class="keyword">return</span> _route_db</div><div class="line"></div><div class="line">    db_for_read = _router_func(<span class="string">'db_for_read'</span>)</div><div class="line">    db_for_write = _router_func(<span class="string">'db_for_write'</span>)</div></pre></td></tr></table></figure>
-<p>router初始化</p>
-<p><code>router = ConnectionRouter()</code></p>
-<p>router引用</p>
-<p><code>django/db/models/query.py</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">QuerySet</span><span class="params">(object)</span>:</span></div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="string">"Return the database that will be used if this query is executed now"</span></div><div class="line">        <span class="keyword">if</span> self._for_write:</div><div class="line">            <span class="keyword">return</span> self._db <span class="keyword">or</span> router.db_for_write(self.model, **self._hints)</div><div class="line">        <span class="keyword">return</span> self._db <span class="keyword">or</span> router.db_for_read(self.model, **self._hints)</div></pre></td></tr></table></figure>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;django ORM数据模型配置数据库．&lt;/p&gt;
-&lt;p&gt;django支持多个数据库，通过django ORM定义数据模型，比如&lt;code&gt;class User(Model)&lt;/code&gt;，无法通过&lt;code&gt;class Meta&lt;/code&gt;配置管理该数据模型对应的数据库，
-    
-    </summary>
-    
-    
-      <category term="django" scheme="http://blog.hotbaby.org/tags/django/"/>
     
   </entry>
   
