@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-11-03T02:48:49.000Z</updated>
+  <updated>2017-11-06T04:25:27.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -17,10 +17,10 @@
   
   <entry>
     <title>UnicodeDecodeError</title>
-    <link href="http://blog.hotbaby.org/2017/11/03/untitled-1509677215394/"/>
-    <id>http://blog.hotbaby.org/2017/11/03/untitled-1509677215394/</id>
-    <published>2017-11-03T02:48:49.000Z</published>
-    <updated>2017-11-03T02:48:49.000Z</updated>
+    <link href="http://blog.hotbaby.org/2017/11/06/untitled-1509677215394/"/>
+    <id>http://blog.hotbaby.org/2017/11/06/untitled-1509677215394/</id>
+    <published>2017-11-06T04:25:27.000Z</published>
+    <updated>2017-11-06T04:25:27.000Z</updated>
     
     <content type="html"><![CDATA[<p> 问题：<br> <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">UnicodeDecodeError: <span class="string">'ascii'</span> codec can<span class="string">'t decode byte 0xe9 in position 0: ordinal not in range(128)</span></div></pre></td></tr></table></figure></p>
 <p> 答案：</p>
@@ -39,10 +39,10 @@
   
   <entry>
     <title>MySQL</title>
-    <link href="http://blog.hotbaby.org/2017/10/29/untitled-1501583914843/"/>
-    <id>http://blog.hotbaby.org/2017/10/29/untitled-1501583914843/</id>
-    <published>2017-10-29T09:15:24.000Z</published>
-    <updated>2017-10-29T09:15:24.000Z</updated>
+    <link href="http://blog.hotbaby.org/2017/11/06/untitled-1501583914843/"/>
+    <id>http://blog.hotbaby.org/2017/11/06/untitled-1501583914843/</id>
+    <published>2017-11-06T04:25:08.000Z</published>
+    <updated>2017-11-06T04:25:08.000Z</updated>
     
     <content type="html"><![CDATA[<p>数据库远程访问</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">GRANT ALL PRIVILEGES ON *.* TO &apos;USERNAME&apos;@&apos;%&apos; IDENTIFIED </div><div class="line">BY &apos;PASSWORD&apos; WITH GRANT OPTION;</div><div class="line">FLUSH PRIVILEGES;</div></pre></td></tr></table></figure>
@@ -81,6 +81,8 @@
 <p>增加外键<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">alter</span> <span class="keyword">table</span> table_name <span class="keyword">add</span> <span class="keyword">constraint</span> foreign_key_name foreign <span class="keyword">key</span>(<span class="string">`column_name`</span>) <span class="keyword">references</span> <span class="string">`reference_table_name`</span>(<span class="string">`column`</span>);</div></pre></td></tr></table></figure></p>
 <p>删除外键</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">alter</span> <span class="keyword">table</span> table_name <span class="keyword">drop</span> foreign <span class="keyword">key</span> fk_name;</div></pre></td></tr></table></figure>
+<p>导出数据库表结构</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqldump  -hhost -P3306 -uusername -ppassword  database_name <span class="comment">--no-data &gt; db_name_schema.sql</span></div></pre></td></tr></table></figure>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html" target="_blank" rel="external">developer mysqldump</a></li>
 <li><a href="http://www.mysqltutorial.org/mysql-foreign-key/" target="_blank" rel="external">MySQL foreign key</a></li>
