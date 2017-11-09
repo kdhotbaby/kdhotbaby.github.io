@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-11-06T04:25:27.000Z</updated>
+  <updated>2017-11-08T03:35:01.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>mysql_config_editor</title>
+    <link href="http://blog.hotbaby.org/2017/11/08/untitled-1510111268169/"/>
+    <id>http://blog.hotbaby.org/2017/11/08/untitled-1510111268169/</id>
+    <published>2017-11-08T03:35:01.000Z</published>
+    <updated>2017-11-08T03:35:01.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><code>mysql_config_editor</code>管理MySQL账号</p>
+<p>配置账号：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysql_config_editor <span class="built_in">set</span> --host=host --port=port --user=username --login-path=login-path-name --password</div></pre></td></tr></table></figure>
+<p>登录：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysql --login-path=login-path-name</div></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://dev.mysql.com/doc/refman/5.6/en/mysql-config-editor.html" target="_blank" rel="external">https://dev.mysql.com/doc/refman/5.6/en/mysql-config-editor.html</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;code&gt;mysql_config_editor&lt;/code&gt;管理MySQL账号&lt;/p&gt;
+&lt;p&gt;配置账号：&lt;/p&gt;
+&lt;figure class=&quot;highlight sh&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;li
+    
+    </summary>
+    
+    
+      <category term="MySQL" scheme="http://blog.hotbaby.org/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>UnicodeDecodeError</title>
@@ -1158,66 +1188,6 @@
     
     
       <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python PyPI Mirror</title>
-    <link href="http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/"/>
-    <id>http://blog.hotbaby.org/2017/06/08/Python-pip-mirror/</id>
-    <published>2017-06-08T06:22:00.000Z</published>
-    <updated>2017-08-23T01:43:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>PyPI(Python Package Index)是Python软件仓库。</p>
-<p>pip是Python包管理工具，默认使用<code>pypi.python.org</code>作为PyPI的镜像。</p>
-<p>pip安装Python软件包经常会出现”链接pypi.python.org失败”。为了优化包的管理，考虑替换<code>pypi.python.org</code>,转而使用国内的PyPI镜像。</p>
-<p><strong>PyPI mirror list</strong></p>
-<table>
-<thead>
-<tr>
-<th>Mirror</th>
-<th>Location</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>pypi.python.org</td>
-<td>San Francisco, California US</td>
-</tr>
-<tr>
-<td>pypi.douban.com</td>
-<td>Beijing, Beijing CN</td>
-</tr>
-<tr>
-<td>pypi.fcio.net</td>
-<td>Oberhausen, Nordrhein-Westfalen DE</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Linux(Debian) 替换PyPI镜像</strong></p>
-<p><code>touch ~/.pip/pip.conf</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[global]</div><div class="line">index-url = https://pypi.douban.com/simple</div><div class="line">format = columns</div></pre></td></tr></table></figure>
-<p><strong>参考</strong></p>
-<ul>
-<li><a href="https://www.pypi-mirrors.org/" target="_blank" rel="external">https://www.pypi-mirrors.org/</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/21863043" target="_blank" rel="external">https://zhuanlan.zhihu.com/p/21863043</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;PyPI(Python Package Index)是Python软件仓库。&lt;/p&gt;
-&lt;p&gt;pip是Python包管理工具，默认使用&lt;code&gt;pypi.python.org&lt;/code&gt;作为PyPI的镜像。&lt;/p&gt;
-&lt;p&gt;pip安装Python软件包经常会出现”链接pyp
-    
-    </summary>
-    
-      <category term="Python" scheme="http://blog.hotbaby.org/categories/Python/"/>
-    
-    
-      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
-    
-      <category term="PyPI" scheme="http://blog.hotbaby.org/tags/PyPI/"/>
     
   </entry>
   
