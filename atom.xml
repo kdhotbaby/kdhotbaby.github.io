@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.hotbaby.org/"/>
-  <updated>2017-12-01T09:14:22.000Z</updated>
+  <updated>2017-12-04T09:14:49.000Z</updated>
   <id>http://blog.hotbaby.org/</id>
   
   <author>
@@ -14,6 +14,62 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python命令行环境变量</title>
+    <link href="http://blog.hotbaby.org/2017/12/04/untitled-1512378645196/"/>
+    <id>http://blog.hotbaby.org/2017/12/04/untitled-1512378645196/</id>
+    <published>2017-12-04T09:14:49.000Z</published>
+    <updated>2017-12-04T09:14:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>命令行配置PYTHONPATH</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PYTHONPATH=<span class="variable">$PWD</span> python script.py</div></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://docs.python.org/2/using/cmdline.html" target="_blank" rel="external">Python cmdline</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;命令行配置PYTHONPATH&lt;/p&gt;
+&lt;figure class=&quot;highlight sh&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MacOS安装PIL</title>
+    <link href="http://blog.hotbaby.org/2017/12/04/untitled-1512358382696/"/>
+    <id>http://blog.hotbaby.org/2017/12/04/untitled-1512358382696/</id>
+    <published>2017-12-04T03:36:23.000Z</published>
+    <updated>2017-12-04T03:36:23.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>MacOS安装PIL库</p>
+<p>安装libjpeg</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">curl -O http://www.ijg.org/files/jpegsrc.v8c.tar.gz</div><div class="line">tar -xvzf jpegsrc.v8c.tar.gz</div><div class="line"><span class="built_in">cd</span> jpeg-8c</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div><div class="line"><span class="built_in">cd</span> ../</div></pre></td></tr></table></figure>
+<p>安装freetype</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">curl -O http://ftp.igh.cnrs.fr/pub/nongnu/freetype/freetype-2.4.5.tar.gz</div><div class="line">tar -xvzf freetype-2.4.5.tar.gz</div><div class="line"><span class="built_in">cd</span> freetype-2.4.5</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div><div class="line"><span class="built_in">cd</span> ../</div></pre></td></tr></table></figure>
+<p>安装PIL</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">curl -O -L http://effbot.org/media/downloads/Imaging-1.1.7.tar.gz</div><div class="line"><span class="comment"># extract</span></div><div class="line">tar -xzf Imaging-1.1.7.tar.gz</div><div class="line"><span class="built_in">cd</span> Imaging-1.1.7</div><div class="line">python setup.py install</div><div class="line"><span class="built_in">cd</span> ..</div></pre></td></tr></table></figure>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://stackoverflow.com/questions/9070074/how-can-i-install-pil-on-mac-os-x-10-7-2-lion" target="_blank" rel="external">stackoverflow install pil on mac OSX</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;MacOS安装PIL库&lt;/p&gt;
+&lt;p&gt;安装libjpeg&lt;/p&gt;
+&lt;figure class=&quot;highlight sh&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;lin
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>MySQL</title>
@@ -1123,74 +1179,6 @@
     
     </summary>
     
-    
-  </entry>
-  
-  <entry>
-    <title>Debian Timezone</title>
-    <link href="http://blog.hotbaby.org/2017/06/09/debian-timezone/"/>
-    <id>http://blog.hotbaby.org/2017/06/09/debian-timezone/</id>
-    <published>2017-06-09T09:20:49.000Z</published>
-    <updated>2017-07-21T09:20:51.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><code>dpkg-reconfigure  tzdata</code></p>
-<p><strong>Referece</strong></p>
-<ul>
-<li><a href="https://wiki.debian.org/TimeZoneChanges" target="_blank" rel="external">https://wiki.debian.org/TimeZoneChanges</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;code&gt;dpkg-reconfigure  tzdata&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Referece&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://wiki.debian.org/TimeZoneChanges&quot; tar
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Python Customization</title>
-    <link href="http://blog.hotbaby.org/2017/06/09/Python-customization/"/>
-    <id>http://blog.hotbaby.org/2017/06/09/Python-customization/</id>
-    <published>2017-06-09T04:20:00.000Z</published>
-    <updated>2017-07-21T09:21:37.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong><code>object.__new__(cls[, ...])</code></strong></p>
-<p><code>object.__new__(cls, *args, **kwargs)</code> Called to create a new instance of class <code>cls.__new__()</code>is <strong>a static method</strong> that take the class as its first argument.The remaining arguments are those passed to the object constructor expression(the call to the class). <strong>The return value of <code>__new__()</code>should be the new object instance(usually an instance of cls).</strong></p>
-<p>Typical implementations create a new instance of the class by invoking the superclass’s <code>__new__()</code>method using <code>super(currentclas, cls).__new__(cls[, ...])</code>with appropriate arguments and then modifying the newly-created instance as necessary before returning it.</p>
-<p>if <code>__new__()</code> return an instance of cls, then the new instance’s <code>__init__()</code> will be invoked.</p>
-<p>if <code>__new__()</code>does not return an instance of cls, then the new instance’s <code>__init__()</code> method will not be invoked.</p>
-<p><code>__new__()</code>is intended mainly to allow subclasses of immutable type(like int, str or tuple) to customize instance creation. It is also commonly overridden in custom metaclass in order to customize class creation.</p>
-<p><strong>object.<strong>init</strong>(self[,…])</strong></p>
-<p><code>object.__init__(self, *args, **kwargs)</code> <strong>Called after the instance has been created</strong> (by <code>__new__()</code>), but before it is returned to the caller. The arguments are those passed to the class constructor expression. If a base class has an <code>__init__()</code>method, the derived class’s <code>__init__()</code>method must explicitly call it to ensure proper initialization of the base class of the instance.</p>
-<p><code>__new__()</code>and<code>__init__()</code>work together in constructing objects(<code>__new__()</code>to create it, and <code>__init__()</code>to customize it). <strong>no non-None value may be returned by <code>__init__()</code>; doing so will cause a TypeError to be raised at runtime.</strong></p>
-<p><strong>object.<strong>del</strong>(self)</strong></p>
-<p>Called when the instance is about to be destroyed. This is also a destructor. If a base class has a <code>__del__()</code> method, the derived class’s <code>__del__()</code>method, must explicitly call it to ensure proper deletion of the base class part of the instance.</p>
-<p>总结：</p>
-<ul>
-<li>作用 <code>object.__new__(cls, *args, **kwargs)</code>用于创建对象实例，<code>object.__init__(self,*args, **kwargs)</code>用于初始化实例</li>
-<li>返回值 <code>__new__(cls)</code>返回对象实例，只有当<code>__new__(cls)</code>返回一个对象实例时，<code>__init__(self)</code>才会被调用。<code>__init__(self)</code>返回None，返回值非None，会抛出异常</li>
-<li>参数 <code>__new__(cls)</code>是一个静态方法，第一个参数是cls. <code>__init__(self)</code>是一个类方法，第一个参数是对象self</li>
-<li>时序 <code>__new__(cls)</code>先与<code>__init(self)__</code>被调用</li>
-</ul>
-<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
-<li><a href="https://docs.python.org/2/reference/datamodel.html#basic-customization" target="_blank" rel="external">https://docs.python.org/2/reference/datamodel.html#basic-customization</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;&lt;code&gt;object.__new__(cls[, ...])&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;object.__new__(cls, *args, **kwargs)&lt;/code&gt; Called to create a new 
-    
-    </summary>
-    
-    
-      <category term="Python" scheme="http://blog.hotbaby.org/tags/Python/"/>
     
   </entry>
   
